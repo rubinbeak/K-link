@@ -1,13 +1,279 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// K-LINK MVP — PostgreSQL (e.g. Supabase). URL from prisma.config.ts / DATABASE_URL.
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  BRAND
+  INFLUENCER
+  ADMIN
+}
+
+enum CampaignStatus {
+  OPEN
+  CLOSED
+}
+
+enum ApplicationStatus {
+  PENDING
+  SELECTED
+  REJECTED
+  SUBMITTED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum CampaignType {
+  VISIT_CONTENT
+}
+
+enum CampaignLifecycleStatus {
+  DRAFT
+  READY_FOR_PAYMENT
+  PAID
+  GUIDELINE_IN_PROGRESS
+  GUIDELINE_CONFIRMED
+  INFLUENCER_LIST_DELIVERED
+  VISIT_SCHEDULED
+  VISIT_DONE
+  CONTENT_UPLOADED
+  REPORT_DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+enum PlaceType {
+  BEAUTY_STORE
+  SHOPPING_MALL
+  POPUP_STORE
+  EVENT_BOOTH
+  CLINIC
+  FASHION_SHOWROOM
+  EXPO
+  RESTAURANT_FNB
+  OTHER
+}
+
+enum VisitGoal {
+  INTRO_EVENT
+  INTRO_STORE
+  PRODUCT_TRY_PROMO
+  BRAND_EXPERIENCE
+  EVENT_PARTICIPATION
+  INTERVIEW
+  NEW_OPEN_PROMO
+  DISCOUNT_PROMO
+  OTHER
+}
+
+enum RegionCode {
+  KR
+  US
+  JP
+  CN
+  EU
+  ME
+  SEA
+  OTHER
+}
+
+enum BenefitType {
+  PRODUCT
+  EXPERIENCE
+  MEAL
+  OTHER
+}
+
+enum GenderTarget {
+  FEMALE
+  MALE
+  ANY
+}
+
+enum FollowerTier {
+  LTE_5K
+  BETWEEN_5K_30K
+  GTE_30K
+}
+
+enum PlatformType {
+  TIKTOK
+  INSTAGRAM
+  XIAOHONGSHU
+  DOUYIN
+  X_TWITTER
+  OTHER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  role      Role
+  bio       String?
+  instagram String?
+  tiktok    String?
+  brandName String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campaigns    Campaign[]    @relation("BrandCampaigns")
+  applications Application[]
+  payments     Payment[]
+  drafts       CampaignDraft[]
+  leads        ConsultingLead[]
+}
+
+model Campaign {
+  id          String         @id @default(cuid())
+  brandId     String
+  brand       User           @relation("BrandCampaigns", fields: [brandId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  budget      Float
+  status      CampaignStatus @default(OPEN)
+  campaignType CampaignType?
+  lifecycle    CampaignLifecycleStatus @default(DRAFT)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  applications Application[]
+  payments     Payment[]
+  visitDetail  VisitCampaignDetail?
+  requirement  InfluencerRequirement?
+  pricing      PricingSnapshot?
+  schedulePlan SchedulePlan?
+}
+
+model Application {
+  id           String            @id @default(cuid())
+  campaignId   String
+  campaign     Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  influencerId String
+  influencer   User              @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  status       ApplicationStatus @default(PENDING)
+  contentUrl   String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@unique([campaignId, influencerId])
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  brandId    String
+  brand      User          @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  campaignId String?
+  campaign   Campaign?     @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  amount     Float
+  status     PaymentStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+model CampaignDraft {
+  id             String   @id @default(cuid())
+  brandId         String
+  brand           User     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  name            String?
+  currentStep     Int      @default(1)
+  data            Json
+  autosaveVersion Int      @default(1)
+  lastSavedAt     DateTime @default(now())
+  isFinalized     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model VisitCampaignDetail {
+  id                String       @id @default(cuid())
+  campaignId         String       @unique
+  campaign           Campaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  placeType          PlaceType
+  visitGoals         VisitGoal[]
+  visitRegion        RegionCode
+  address            String
+  venueDescription   String?
+  eventStartDate     DateTime
+  eventEndDate       DateTime?
+  operationStartTime String
+  operationEndTime   String
+  hasBenefits        Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  benefits VisitBenefit[]
+}
+
+model VisitBenefit {
+  id                 String            @id @default(cuid())
+  visitCampaignId     String
+  visitCampaign       VisitCampaignDetail @relation(fields: [visitCampaignId], references: [id], onDelete: Cascade)
+  type               BenefitType
+  productDescription String?
+  productValueKrw    Int?
+}
+
+model InfluencerRequirement {
+  id           String        @id @default(cuid())
+  campaignId    String        @unique
+  campaign      Campaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  targetRegions RegionCode[]
+  genderTarget  GenderTarget
+  followerTier  FollowerTier
+  headcount     Int
+  platforms     PlatformType[]
+  uploadDueDays Int           @default(7)
+}
+
+model PricingSnapshot {
+  id                   String   @id @default(cuid())
+  campaignId            String   @unique
+  campaign              Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  basePriceKrw          Int
+  followerSurchargeKrw  Int
+  unitPriceKrw          Int
+  headcount             Int
+  totalPriceKrw         Int
+  currency              String   @default("KRW")
+  createdAt             DateTime @default(now())
+}
+
+model SchedulePlan {
+  id                    String   @id @default(cuid())
+  campaignId             String   @unique
+  campaign               Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  guidelineConfirmBy     DateTime?
+  influencerListDelivery DateTime?
+  visitStartDate         DateTime
+  uploadDueDate          DateTime
+  reportDueDate          DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model ConsultingLead {
+  id           String      @id @default(cuid())
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  channel       String
+  name          String
+  company       String?
+  email         String
+  phone         String?
+  targetRegion  RegionCode?
+  message       String?
+  status        String      @default("RECEIVED")
+  createdAt     DateTime    @default(now())
 }

@@ -1,102 +1,116 @@
-import Image from "next/image";
+import Link from "next/link";
+import { auth } from "@/auth";
+import { MiniVisualMotif } from "@/components/visual/mini-visual-motif";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-export default function Home() {
+export default async function HomePage() {
+  const session = await auth();
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="relative min-h-dvh overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-32 -top-20 h-72 w-72 rounded-full bg-fuchsia-300/30 blur-3xl" />
+        <div className="absolute right-0 top-24 h-80 w-80 rounded-full bg-pink-200/40 blur-3xl" />
+      </div>
+      <header className="relative border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+          <span className="text-lg font-semibold tracking-tight">
+            <span className="text-primary">K-LINK</span>
+          </span>
+          <div className="flex items-center gap-2">
+            {session?.user ? (
+              <Link
+                href={
+                  session.user.role === "BRAND"
+                    ? "/brand"
+                    : session.user.role === "INFLUENCER"
+                      ? "/influencer/feed"
+                      : "/admin"
+                }
+                className={cn(buttonVariants({ size: "sm" }))}
+              >
+                대시보드
+              </Link>
+            ) : (
+              <Link href="/login" className={cn(buttonVariants({ size: "sm" }))}>
+                로그인
+              </Link>
+            )}
+          </div>
         </div>
+      </header>
+
+      <main className="relative mx-auto max-w-6xl px-4 py-16 sm:py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            방문형 콘텐츠 캠페인 플랫폼
+          </span>
+          <h1 className="mt-5 font-heading text-4xl font-semibold leading-tight tracking-tight text-balance sm:text-6xl">
+            브랜드와 인플루언서를
+            <br className="hidden sm:block" /> 가장 빠르게 연결합니다
+          </h1>
+          <p className="mt-5 text-pretty text-base text-muted-foreground sm:text-lg">
+            브랜드는 캠페인을 만들고, 인플루언서는 지원하고, 운영팀은 전체 과정을 관리합니다.
+            <br className="hidden sm:block" />
+            입구는 분리되어도 운영 데이터는 하나로 연결됩니다.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full border border-border/70 bg-background/80 px-2.5 py-1">브랜드 전용 페이지</span>
+            <span className="rounded-full border border-border/70 bg-background/80 px-2.5 py-1">크리에이터 다국어 페이지</span>
+            <span className="rounded-full border border-border/70 bg-background/80 px-2.5 py-1">통합 운영 대시보드</span>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-16 grid max-w-4xl gap-8 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <MiniVisualMotif
+              title="플랫폼 실시간 흐름"
+              description="브랜드 등록부터 인플루언서 업로드까지 한눈에 파악할 수 있습니다."
+            />
+          </div>
+          <Card className="rounded-3xl border-border/70 bg-card/85 shadow-xl shadow-pink-100/50 backdrop-blur-md transition hover:-translate-y-1 hover:shadow-2xl">
+            <CardHeader>
+              <CardTitle className="font-heading text-xl">브랜드 담당자</CardTitle>
+              <CardDescription className="text-pretty text-base leading-relaxed">
+                캠페인 등록부터 결제, 지원자 선정, 결과 확인까지 한국어로 쉽고 빠르게 진행할 수 있습니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+              <Link href="/for-brands" className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-auto")}>
+                브랜드 페이지 보기
+              </Link>
+              <p className="text-xs text-muted-foreground">서비스 소개, 요금, 캠페인 세팅 바로가기</p>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-3xl border-border/70 bg-card/85 shadow-xl shadow-pink-100/50 backdrop-blur-md transition hover:-translate-y-1 hover:shadow-2xl">
+            <CardHeader>
+              <CardTitle className="font-heading text-xl">크리에이터 / 인플루언서</CardTitle>
+              <CardDescription className="text-pretty text-base leading-relaxed">
+                영어, 한국어, 중국어, 일본어로 참여 방법을 확인하고, 캠페인 지원 흐름을 바로 이해할 수 있습니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+              <Link href="/creators" className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-auto")}>
+                크리에이터 페이지 보기
+              </Link>
+              <p className="text-xs text-muted-foreground">다국어 안내 및 참여 동선 제공</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <p className="mt-14 text-center text-sm text-muted-foreground">
+          이미 계정이 있으신가요?{" "}
+          <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
+            로그인
+          </Link>
+        </p>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="relative border-t border-border/50 bg-background/60 py-8 text-center text-xs text-muted-foreground backdrop-blur-xl">
+        K-LINK · Next.js · Prisma · NextAuth
       </footer>
     </div>
   );

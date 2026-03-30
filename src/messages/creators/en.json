@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "title": "Creators — K-LINK",
+    "description": "Join K-LINK to collaborate with Korean beauty brands on paid campaigns worldwide."
+  },
+  "lang": {
+    "label": "Language",
+    "en": "English",
+    "ko": "Korean",
+    "zh": "Chinese (Simplified)",
+    "ja": "Japanese"
+  },
+  "nav": {
+    "brandSite": "For brands",
+    "login": "Sign in",
+    "home": "Home",
+    "portal": "Open app"
+  },
+  "hero": {
+    "eyebrow": "Global creators · K-beauty",
+    "title": "Your next campaign starts with Korean beauty brands",
+    "subtitle": "Browse open briefs, apply in one place, and submit content when you're selected — all on one platform built for trust and clarity."
+  },
+  "steps": {
+    "title": "How it works",
+    "1t": "Create your profile",
+    "1d": "Share your channels, audience, and the kind of content you love to make.",
+    "2t": "Discover campaigns",
+    "2d": "Explore active K-beauty collaborations that match your style and region.",
+    "3t": "Apply & get selected",
+    "3d": "Brands review applicants; if you're chosen, you'll move forward with clear deliverables.",
+    "4t": "Publish & submit",
+    "4d": "Post your content and drop your links in K-LINK so brands can review results."
+  },
+  "cta": {
+    "primary": "Sign in to apply",
+    "secondary": "New to K-LINK? Use a demo account on the login page to explore."
+  },
+  "kpi": {
+    "active": "Live campaigns",
+    "response": "Avg. response time",
+    "global": "Target countries",
+    "payout": "Monthly payout sample"
+  },
+  "benefits": {
+    "title": "Why creators stay on K-LINK",
+    "1t": "Better brand matching",
+    "1d": "Find Korean beauty campaigns that fit your audience and content tone.",
+    "2t": "Clear collaboration flow",
+    "2d": "Guidelines, timelines, and submission requirements stay in one place.",
+    "3t": "Faster performance sharing",
+    "3d": "Share links quickly and close campaigns with transparent feedback."
+  },
+  "showcase": {
+    "title": "Creator performance showcase",
+    "earningsTitle": "Estimated earnings simulation",
+    "earningsDesc": "Visual sample by campaign value and complexity.",
+    "contentTitle": "Trending content formats",
+    "contentDesc": "From short-form reels to in-store vlogs, optimized for beauty.",
+    "marketsTitle": "Market response intensity",
+    "marketsDesc": "See where audience response is strongest by region."
+  },
+  "discovery": {
+    "filterTitle": "Explore campaigns by country",
+    "all": "All",
+    "jp": "Japan",
+    "us": "United States",
+    "cn": "China",
+    "sea": "SEA",
+    "kr": "Korea",
+    "shortformTitle": "Short-form references",
+    "shortformSubtitle": "Preview public style references and shape your next content angle faster.",
+    "watch": "Watch clip",
+    "campaignTitle": "Sample campaigns you can apply to",
+    "campaignSubtitle": "Filter by market and find opportunities that match your audience.",
+    "apply": "Apply to this campaign",
+    "reward": "Est. reward",
+    "slots": "Open slots",
+    "deadline": "Deadline window",
+    "views": "Views",
+    "engagement": "Engagement"
+  },
+  "trust": {
+    "title": "Built for cross-border collaboration",
+    "body": "One account, transparent application status, and a dedicated space to share your published work with brands."
+  },
+  "footer": {
+    "rights": "© K-LINK. Connecting brands and creators.",
+    "note": "Campaign availability and eligibility may vary by brand and region."
+  }
+}

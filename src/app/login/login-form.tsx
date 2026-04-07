@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function LoginForm({ defaultEmail = "" }: { defaultEmail?: string }) {
+export function LoginForm({ defaultEmail = "", callbackUrl = "/auth/redirect" }: { defaultEmail?: string; callbackUrl?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -23,7 +23,7 @@ export function LoginForm({ defaultEmail = "" }: { defaultEmail?: string }) {
       email,
       password,
       redirect: false,
-      callbackUrl: "/auth/redirect",
+      callbackUrl,
     });
 
     setLoading(false);
@@ -33,7 +33,7 @@ export function LoginForm({ defaultEmail = "" }: { defaultEmail?: string }) {
       return;
     }
 
-    window.location.href = "/auth/redirect";
+    window.location.href = res?.url ?? callbackUrl;
   }
 
   return (
@@ -45,7 +45,7 @@ export function LoginForm({ defaultEmail = "" }: { defaultEmail?: string }) {
         disabled={googleLoading}
         onClick={async () => {
           setGoogleLoading(true);
-          await signIn("google", { callbackUrl: "/auth/redirect" });
+          await signIn("google", { callbackUrl });
           setGoogleLoading(false);
         }}
       >

@@ -1,6 +1,16 @@
+import { redirect } from "next/navigation";
 import { ConsultingForm } from "@/app/consulting/consulting-form";
+import { auth } from "@/auth";
 
-export default function ConsultingPage() {
+export default async function ConsultingPage() {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login?callbackUrl=/consulting");
+  }
+  if (session.user.role !== "BRAND") {
+    redirect("/auth/redirect");
+  }
+
   return (
     <div className="relative min-h-dvh overflow-hidden">
       <div className="pointer-events-none absolute inset-0">

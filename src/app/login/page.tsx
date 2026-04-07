@@ -3,9 +3,15 @@ import { LoginForm } from "./login-form";
 import { MiniVisualMotif } from "@/components/visual/mini-visual-motif";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default async function LoginPage({ searchParams }: { searchParams?: Promise<{ email?: string }> }) {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ email?: string; callbackUrl?: string }>;
+}) {
   const resolvedSearchParams = await searchParams;
   const defaultEmail = resolvedSearchParams?.email ?? "";
+  const rawCallbackUrl = resolvedSearchParams?.callbackUrl ?? "";
+  const callbackUrl = rawCallbackUrl.startsWith("/") ? rawCallbackUrl : "/auth/redirect";
 
   return (
     <div className="relative min-h-dvh overflow-hidden">
@@ -29,7 +35,7 @@ export default async function LoginPage({ searchParams }: { searchParams?: Promi
           </CardHeader>
           <CardContent className="space-y-6">
             <MiniVisualMotif title="빠른 시작 가이드" description="로그인 후 역할에 맞는 대시보드로 자동 이동됩니다." />
-            <LoginForm defaultEmail={defaultEmail} />
+            <LoginForm defaultEmail={defaultEmail} callbackUrl={callbackUrl} />
             <p className="text-center text-xs text-muted-foreground">
               브랜드 계정이 없다면 <Link href="/signup" className="font-medium text-foreground hover:underline">회원가입</Link>
             </p>

@@ -27,6 +27,10 @@ import {
 
 export type CampaignDraftData = {
   step1: {
+    contactBrandName: string;
+    contactManagerProfile: string;
+    contactEmail: string;
+    contactPhone: string;
     campaignName: string;
     placeType: string;
     visitGoals: string[];
@@ -55,6 +59,10 @@ export type CampaignDraftData = {
 
 const defaultData: CampaignDraftData = {
   step1: {
+    contactBrandName: "",
+    contactManagerProfile: "",
+    contactEmail: "",
+    contactPhone: "",
     campaignName: "",
     placeType: "",
     visitGoals: [],
@@ -254,6 +262,60 @@ export function CampaignSetupWizard({
           <CardContent className="space-y-5">
             {step === 1 ? (
               <>
+                <div className="rounded-xl border border-primary/15 bg-primary/5 p-4 sm:p-5">
+                  <div className="mb-4">
+                    <p className="text-[11px] font-semibold tracking-widest text-primary">1. 기본 정보</p>
+                    <h3 className="mt-1 text-lg font-semibold tracking-tight text-zinc-900">담당자 정보를 알려주세요</h3>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="contactBrandName">회사 / 브랜드명 *</Label>
+                      <Input
+                        id="contactBrandName"
+                        required
+                        value={data.step1.contactBrandName}
+                        onChange={(e) =>
+                          setData((p) => ({ ...p, step1: { ...p.step1, contactBrandName: e.target.value } }))
+                        }
+                        placeholder="예: K-LINK Beauty"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactManagerProfile">직함, 담당자 이름 *</Label>
+                      <Input
+                        id="contactManagerProfile"
+                        required
+                        value={data.step1.contactManagerProfile}
+                        onChange={(e) =>
+                          setData((p) => ({ ...p, step1: { ...p.step1, contactManagerProfile: e.target.value } }))
+                        }
+                        placeholder="예: 마케팅 매니저 김민지"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactEmail">이메일 *</Label>
+                      <Input
+                        id="contactEmail"
+                        type="email"
+                        required
+                        value={data.step1.contactEmail}
+                        onChange={(e) => setData((p) => ({ ...p, step1: { ...p.step1, contactEmail: e.target.value } }))}
+                        placeholder="you@brand.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactPhone">연락처 *</Label>
+                      <Input
+                        id="contactPhone"
+                        type="tel"
+                        required
+                        value={data.step1.contactPhone}
+                        onChange={(e) => setData((p) => ({ ...p, step1: { ...p.step1, contactPhone: e.target.value } }))}
+                        placeholder="예: 010-1234-5678"
+                      />
+                    </div>
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="campaignName">캠페인 이름</Label>
                   <Input

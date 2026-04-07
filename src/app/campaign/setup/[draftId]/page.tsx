@@ -5,11 +5,11 @@ import { prisma } from "@/lib/prisma";
 import { CampaignSetupWizard, type CampaignDraftData } from "@/components/campaign/campaign-setup-wizard";
 
 export default async function CampaignSetupEditPage({ params }: { params: Promise<{ draftId: string }> }) {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
-  if (session.user.role !== "BRAND") redirect("/brand");
-
   const { draftId } = await params;
+  const session = await auth();
+  if (!session?.user) redirect(`/login?callbackUrl=${encodeURIComponent(`/campaign/setup/${draftId}`)}`);
+  if (session.user.role !== "BRAND") redirect("/auth/redirect");
+
   const draft = await prisma.campaignDraft.findUnique({ where: { id: draftId } });
   if (!draft || draft.brandId !== session.user.id) redirect("/campaign/setup");
 

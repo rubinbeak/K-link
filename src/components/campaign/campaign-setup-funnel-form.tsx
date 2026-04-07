@@ -49,6 +49,10 @@ const UNIT_PRICE_OVER_5K = 500000;
 
 type CampaignSetupFormData = {
   step1: {
+    contactBrandName: string;
+    contactManagerProfile: string;
+    contactEmail: string;
+    contactPhone: string;
     campaignName: string;
     placeType: string;
     placeTypeCustom: string;
@@ -90,6 +94,10 @@ type CampaignSetupFormData = {
 
 const defaultData: CampaignSetupFormData = {
   step1: {
+    contactBrandName: "",
+    contactManagerProfile: "",
+    contactEmail: "",
+    contactPhone: "",
     campaignName: "",
     placeType: "",
     placeTypeCustom: "",
@@ -333,6 +341,78 @@ export function CampaignSetupFunnelForm() {
                 <div key={step} className="space-y-5 animate-in fade-in-0 slide-in-from-bottom-1 duration-300">
                   {step === 1 ? (
                     <>
+                      <div className={sectionCard}>
+                        <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-primary">
+                          <Sparkles className="size-3.5" />
+                          1. 기본 정보
+                        </p>
+                        <h3 className="mb-4 text-lg font-semibold tracking-tight text-zinc-900">담당자 정보를 알려주세요</h3>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="contactBrandName">회사 / 브랜드명 *</Label>
+                            <Input
+                              id="contactBrandName"
+                              required
+                              value={formData.step1.contactBrandName}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  step1: { ...prev.step1, contactBrandName: e.target.value },
+                                }))
+                              }
+                              placeholder="예: K-LINK Beauty"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="contactManagerProfile">직함, 담당자 이름 *</Label>
+                            <Input
+                              id="contactManagerProfile"
+                              required
+                              value={formData.step1.contactManagerProfile}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  step1: { ...prev.step1, contactManagerProfile: e.target.value },
+                                }))
+                              }
+                              placeholder="예: 마케팅 매니저 김민지"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="contactEmail">이메일 *</Label>
+                            <Input
+                              id="contactEmail"
+                              type="email"
+                              required
+                              value={formData.step1.contactEmail}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  step1: { ...prev.step1, contactEmail: e.target.value },
+                                }))
+                              }
+                              placeholder="you@brand.com"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="contactPhone">연락처 *</Label>
+                            <Input
+                              id="contactPhone"
+                              type="tel"
+                              required
+                              value={formData.step1.contactPhone}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  step1: { ...prev.step1, contactPhone: e.target.value },
+                                }))
+                              }
+                              placeholder="예: 010-1234-5678"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
                       <div className={sectionCard}>
                         <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-primary">
                           <Sparkles className="size-3.5" />

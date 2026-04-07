@@ -8,12 +8,14 @@ export function LoginForm({
   callbackUrl = "/auth/redirect",
   intent = "login",
   googleEnabled = true,
+  initialError = null,
 }: {
   callbackUrl?: string;
   intent?: "login" | "signup";
   googleEnabled?: boolean;
+  initialError?: string | null;
 }) {
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
   const [googleLoading, setGoogleLoading] = useState(false);
   const ctaLabel = intent === "signup" ? "Google로 회원가입" : "Google로 로그인";
   const helperText =

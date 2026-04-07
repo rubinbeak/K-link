@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { LoginForm } from "./login-form";
-import { MiniVisualMotif } from "@/components/visual/mini-visual-motif";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ email?: string; callbackUrl?: string }>;
+  searchParams?: Promise<{ callbackUrl?: string; intent?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const defaultEmail = resolvedSearchParams?.email ?? "";
   const rawCallbackUrl = resolvedSearchParams?.callbackUrl ?? "";
   const callbackUrl = rawCallbackUrl.startsWith("/") ? rawCallbackUrl : "/auth/redirect";
+  const intent = resolvedSearchParams?.intent === "signup" ? "signup" : "login";
+  const googleEnabled = Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET);
 
   return (
     <div className="relative min-h-dvh overflow-hidden">
@@ -28,25 +28,33 @@ export default async function LoginPage({
         </div>
         <Card className="rounded-3xl border-border/70 bg-card/85 shadow-2xl shadow-pink-100/45 backdrop-blur-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="font-heading text-2xl tracking-tight">로그인</CardTitle>
+            <CardTitle className="font-heading text-2xl tracking-tight">{intent === "signup" ? "브랜드 회원가입" : "브랜드 로그인"}</CardTitle>
             <CardDescription>
-              브랜드 계정으로 로그인하거나 회원가입 후 VISIT 콘텐츠 캠페인 운영을 시작하세요.
+              Google 계정으로 간편하게 {intent === "signup" ? "가입" : "로그인"}하고 VISIT 콘텐츠 캠페인 운영을 시작하세요.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <MiniVisualMotif title="빠른 시작 가이드" description="로그인 후 역할에 맞는 대시보드로 자동 이동됩니다." />
-            <LoginForm defaultEmail={defaultEmail} callbackUrl={callbackUrl} />
+          <CardContent className="space-y-5">
+            <LoginForm callbackUrl={callbackUrl} intent={intent} googleEnabled={googleEnabled} />
             <p className="text-center text-xs text-muted-foreground">
-              브랜드 계정이 없다면 <Link href="/signup" className="font-medium text-foreground hover:underline">회원가입</Link>
+              {intent === "signup" ? (
+                <>
+                  이미 계정이 있다면{" "}
+                  <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-medium text-foreground hover:underline">
+                    로그인
+                  </Link>
+                </>
+              ) : (
+                <>
+                  계정이 없다면{" "}
+                  <Link
+                    href={`/login?intent=signup&callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                    className="font-medium text-foreground hover:underline"
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
             </p>
-            <div className="rounded-xl border border-dashed border-border/80 bg-muted/50 p-4 text-xs text-muted-foreground">
-              <p className="font-medium text-foreground">데모 계정 (비밀번호: demo123)</p>
-              <ul className="mt-2 list-inside list-disc space-y-1">
-                <li>brand@k-link.demo — 브랜드 포털</li>
-                <li>influencer@k-link.demo — 인플루언서 포털</li>
-                <li>admin@k-link.demo — 관리자</li>
-              </ul>
-            </div>
           </CardContent>
         </Card>
       </div>

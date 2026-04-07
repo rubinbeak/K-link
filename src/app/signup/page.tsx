@@ -1,8 +1,13 @@
 import Link from "next/link";
-import { SignupForm } from "./signup-form";
+import { LoginForm } from "@/app/login/login-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function SignupPage() {
+export default async function SignupPage({ searchParams }: { searchParams?: Promise<{ callbackUrl?: string }> }) {
+  const resolvedSearchParams = await searchParams;
+  const rawCallbackUrl = resolvedSearchParams?.callbackUrl ?? "";
+  const callbackUrl = rawCallbackUrl.startsWith("/") ? rawCallbackUrl : "/auth/redirect";
+  const googleEnabled = Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET);
+
   return (
     <div className="relative min-h-dvh overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
@@ -20,11 +25,11 @@ export default function SignupPage() {
           <CardHeader className="space-y-1">
             <CardTitle className="font-heading text-2xl tracking-tight">브랜드 회원가입</CardTitle>
             <CardDescription>
-              캠페인 세팅, 결제(무통장입금), 진행 현황 확인을 위한 브랜드 전용 계정을 생성합니다.
+              별도 폼 입력 없이 Google 계정으로 바로 가입할 수 있습니다.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            <SignupForm />
+            <LoginForm callbackUrl={callbackUrl} intent="signup" googleEnabled={googleEnabled} />
             <p className="text-center text-xs text-muted-foreground">
               이미 계정이 있다면 <Link href="/login" className="font-medium text-foreground hover:underline">로그인</Link>으로 이동해 주세요.
             </p>

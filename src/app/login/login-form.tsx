@@ -3,89 +3,47 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
-export function LoginForm({ defaultEmail = "", callbackUrl = "/auth/redirect" }: { defaultEmail?: string; callbackUrl?: string }) {
+export function LoginForm({
+  callbackUrl = "/auth/redirect",
+  intent = "login",
+  googleEnabled = true,
+}: {
+  callbackUrl?: string;
+  intent?: "login" | "signup";
+  googleEnabled?: boolean;
+}) {
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    const form = e.currentTarget;
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-      callbackUrl,
-    });
-
-    setLoading(false);
-
-    if (res?.error) {
-      setError("이메일 또는 비밀번호를 확인해 주세요.");
-      return;
-    }
-
-    window.location.href = res?.url ?? callbackUrl;
-  }
+  const ctaLabel = intent === "signup" ? "Google로 회원가입" : "Google로 로그인";
+  const helperText =
+    intent === "signup"
+      ? "처음 Google로 접속하면 브랜드 계정이 자동으로 생성됩니다."
+      : "Google 계정으로 바로 로그인할 수 있습니다.";
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <div className="space-y-4">
       <Button
         type="button"
-        variant="outline"
         className="w-full"
-        disabled={googleLoading}
+        disabled={googleLoading || !googleEnabled}
         onClick={async () => {
+          if (!googleEnabled) return;
+          setError(null);
           setGoogleLoading(true);
-          await signIn("google", { callbackUrl });
+          await signIn("google", { callbackUrl, redirect: true });
           setGoogleLoading(false);
         }}
       >
-        {googleLoading ? "구글 로그인으로 이동 중..." : "Google로 계속하기"}
+        {googleLoading ? "Google 인증으로 이동 중..." : ctaLabel}
       </Button>
-      <div className="relative py-1">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border/70" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">또는</span>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="email">이메일</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          defaultValue={defaultEmail}
-          placeholder="you@example.com"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">비밀번호</Label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          placeholder="••••••••"
-        />
-      </div>
-      {error ? <p className="text-sm text-destructive">이메일 또는 비밀번호를 확인해 주세요.</p> : null}
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "로그인 중..." : "로그인"}
-      </Button>
-    </form>
+      {googleEnabled ? <p className="text-center text-xs text-muted-foreground">{helperText}</p> : null}
+      {!googleEnabled ? (
+        <p className="text-sm text-destructive">
+          Google 로그인이 아직 활성화되지 않았습니다. `AUTH_GOOGLE_ID`와 `AUTH_GOOGLE_SECRET` 환경 변수를 먼저 설정해 주세요.
+        </p>
+      ) : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+    </div>
   );
 }

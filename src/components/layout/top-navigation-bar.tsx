@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const centerMenu = [
@@ -16,8 +17,22 @@ function isActivePath(pathname: string, match: string) {
   return pathname === match || pathname.startsWith(`${match}/`);
 }
 
+function homeForRole(role?: string) {
+  switch (role) {
+    case "BRAND":
+      return "/brand";
+    case "INFLUENCER":
+      return "/for-brands";
+    case "ADMIN":
+      return "/admin";
+    default:
+      return "/auth/redirect";
+  }
+}
+
 export function TopNavigationBar() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [introPassed, setIntroPassed] = useState(true);
@@ -42,6 +57,10 @@ export function TopNavigationBar() {
   }, [pathname]);
 
   const isAuthActive = useMemo(() => pathname === "/login" || pathname.startsWith("/signup"), [pathname]);
+  const isAuthenticated = status === "authenticated";
+  const userRole = session?.user?.role;
+  const dashboardHref = homeForRole(userRole);
+  const displayName = session?.user?.name || session?.user?.email || "내 계정";
 
   const hideForHeroIntro = pathname === "/for-brands" && !introPassed;
 
@@ -86,17 +105,36 @@ export function TopNavigationBar() {
         </nav>
 
         <div className="hidden items-center md:flex">
-          <Link
-            href="/login"
-            className={cn(
-              "rounded-full border px-3.5 py-1.5 text-sm font-semibold transition",
-              isAuthActive
-                ? "border-primary/45 bg-primary/8 text-primary"
-                : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-900",
-            )}
-          >
-            로그인/회원가입
-          </Link>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="max-w-[180px] truncate text-xs text-zinc-600">{displayName}</span>
+              <Link
+                href={dashboardHref}
+                className="rounded-full border border-primary/45 bg-primary/8 px-3.5 py-1.5 text-sm font-semibold text-primary transition hover:bg-primary/12"
+              >
+                내 대시보드
+              </Link>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/for-brands" })}
+                className="rounded-full border border-zinc-300 bg-white px-3.5 py-1.5 text-sm font-semibold text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-900"
+              >
+                로그아웃
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className={cn(
+                "rounded-full border px-3.5 py-1.5 text-sm font-semibold transition",
+                isAuthActive
+                  ? "border-primary/45 bg-primary/8 text-primary"
+                  : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-900",
+              )}
+            >
+              로그인/회원가입
+            </Link>
+          )}
         </div>
 
         <button
@@ -129,15 +167,33 @@ export function TopNavigationBar() {
                 </Link>
               );
             })}
-            <Link
-              href="/login"
-              className={cn(
-                "mt-2 block rounded-lg border px-3 py-2.5 text-sm font-semibold transition",
-                isAuthActive ? "border-primary/45 bg-primary/8 text-primary" : "border-zinc-300 text-zinc-700 hover:bg-zinc-100",
-              )}
-            >
-              로그인/회원가입
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href={dashboardHref}
+                  className="mt-2 block rounded-lg border border-primary/45 bg-primary/8 px-3 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/12"
+                >
+                  내 대시보드
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => signOut({ callbackUrl: "/for-brands" })}
+                  className="mt-2 block w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-left text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100"
+                >
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className={cn(
+                  "mt-2 block rounded-lg border px-3 py-2.5 text-sm font-semibold transition",
+                  isAuthActive ? "border-primary/45 bg-primary/8 text-primary" : "border-zinc-300 text-zinc-700 hover:bg-zinc-100",
+                )}
+              >
+                로그인/회원가입
+              </Link>
+            )}
           </nav>
         </div>
       ) : null}

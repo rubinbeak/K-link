@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { LoginForm } from "./login-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -24,6 +26,11 @@ export default async function LoginPage({
 }: {
   searchParams?: Promise<{ callbackUrl?: string; intent?: string; error?: string }>;
 }) {
+  const session = await auth();
+  if (session?.user) {
+    redirect("/auth/redirect");
+  }
+
   const resolvedSearchParams = await searchParams;
   const rawCallbackUrl = resolvedSearchParams?.callbackUrl ?? "";
   const callbackUrl = rawCallbackUrl.startsWith("/") ? rawCallbackUrl : "/auth/redirect";

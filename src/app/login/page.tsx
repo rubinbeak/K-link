@@ -28,7 +28,7 @@ export default async function LoginPage({
 }) {
   const session = await auth();
   if (session?.user) {
-    redirect("/auth/redirect");
+    redirect("/my");
   }
 
   const resolvedSearchParams = await searchParams;

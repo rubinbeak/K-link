@@ -3,16 +3,16 @@ import { redirect } from "next/navigation";
 
 export default async function AuthRedirectPage() {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user) redirect("/login?callbackUrl=/my");
 
   switch (session.user.role) {
     case "BRAND":
       redirect("/brand");
     case "INFLUENCER":
-      redirect("/for-brands");
+      redirect("/influencer/my");
     case "ADMIN":
       redirect("/admin");
     default:
-      redirect("/for-brands");
+      redirect("/my");
   }
 }

@@ -22,11 +22,11 @@ function homeForRole(role?: string) {
     case "BRAND":
       return "/brand";
     case "INFLUENCER":
-      return "/for-brands";
+      return "/influencer/my";
     case "ADMIN":
       return "/admin";
     default:
-      return "/auth/redirect";
+      return "/my";
   }
 }
 

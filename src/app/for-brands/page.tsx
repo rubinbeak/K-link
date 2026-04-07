@@ -443,7 +443,7 @@ export default function ForBrandsPage() {
               <div className="rounded-xl border border-zinc-200/90 bg-white p-5">
                 <p className="inline-flex items-center gap-1 text-[11px] font-semibold tracking-[0.12em] text-zinc-600">
                   <Sparkles className="size-3.5" />
-                  한눈에 보는 캠페인 대시보드
+                  한눈에 보는 캠페인 마이페이지
                 </p>
                 <h3 className="mt-2 max-w-3xl text-balance break-keep font-heading text-xl font-bold leading-[1.2] tracking-tight text-zinc-900">
                   실행 전 성과 가능성을 확인하고 시작

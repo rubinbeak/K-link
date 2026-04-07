@@ -6,7 +6,7 @@ export default function BrandLayout({ children }: { children: React.ReactNode })
       <PortalHeader
         title="Brand"
         nav={[
-          { href: "/brand", label: "Dashboard" },
+          { href: "/brand", label: "My page" },
           { href: "/campaign/setup", label: "Campaign setup" },
         ]}
       />

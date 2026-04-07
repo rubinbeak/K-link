@@ -119,7 +119,7 @@ export default function BrandProcessPage() {
         <section className="mt-14 border-t border-border/60 pt-12">
           <div className="mb-6">
             <p className="text-xs font-semibold tracking-[0.14em] text-primary">OPERATIONS VIEW</p>
-            <h2 className="mt-2 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">6단계 운영 대시보드</h2>
+            <h2 className="mt-2 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">6단계 운영 마이페이지</h2>
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
               내비·KPI·일정 힌트를 한 화면에서 스캔할 수 있는 뷰입니다. 메인 페이지에서는 흐름만 보여 드리고, 상세는 이 페이지에 모았습니다.
             </p>

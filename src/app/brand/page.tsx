@@ -45,7 +45,7 @@ export default async function BrandDashboardPage() {
       </div>
 
       <MiniVisualMotif
-        title="Brand dashboard snapshot"
+        title="Brand my page snapshot"
         description="Quickly review campaign conversion before checking applicant details."
       />
 

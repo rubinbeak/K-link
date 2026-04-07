@@ -59,7 +59,7 @@ export function TopNavigationBar() {
   const isAuthActive = useMemo(() => pathname === "/login" || pathname.startsWith("/signup"), [pathname]);
   const isAuthenticated = status === "authenticated";
   const userRole = session?.user?.role;
-  const dashboardHref = homeForRole(userRole);
+  const myPageHref = homeForRole(userRole);
   const displayName = session?.user?.name || session?.user?.email || "내 계정";
 
   const hideForHeroIntro = pathname === "/for-brands" && !introPassed;
@@ -109,10 +109,10 @@ export function TopNavigationBar() {
             <div className="flex items-center gap-2">
               <span className="max-w-[180px] truncate text-xs text-zinc-600">{displayName}</span>
               <Link
-                href={dashboardHref}
+                href={myPageHref}
                 className="rounded-full border border-primary/45 bg-primary/8 px-3.5 py-1.5 text-sm font-semibold text-primary transition hover:bg-primary/12"
               >
-                내 대시보드
+                내 마이페이지
               </Link>
               <button
                 type="button"
@@ -170,10 +170,10 @@ export function TopNavigationBar() {
             {isAuthenticated ? (
               <>
                 <Link
-                  href={dashboardHref}
+                  href={myPageHref}
                   className="mt-2 block rounded-lg border border-primary/45 bg-primary/8 px-3 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/12"
                 >
-                  내 대시보드
+                  내 마이페이지
                 </Link>
                 <button
                   type="button"

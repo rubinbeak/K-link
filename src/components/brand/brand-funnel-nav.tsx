@@ -14,10 +14,11 @@ const funnelNavItems = [
   { step: "04", label: "로그인/회원가입", href: "/login" },
 ] as const;
 
-function resolveDashboardHref(role?: NonNullable<SessionUser>["role"]) {
+function resolveMyPageHref(role?: NonNullable<SessionUser>["role"]) {
   if (role === "BRAND") return "/brand";
-  if (role === "INFLUENCER") return "/for-brands";
-  return "/admin";
+  if (role === "INFLUENCER") return "/influencer/my";
+  if (role === "ADMIN") return "/admin";
+  return "/my";
 }
 
 export function BrandFunnelNav({ sessionUser }: { sessionUser: SessionUser }) {
@@ -41,8 +42,8 @@ export function BrandFunnelNav({ sessionUser }: { sessionUser: SessionUser }) {
               <ArrowRight className="size-4 shrink-0 transition group-hover:translate-x-0.5" />
             </Link>
             {sessionUser ? (
-              <Link href={resolveDashboardHref(sessionUser.role)} className={cn(buttonVariants({ variant: "outline", size: "sm" }), "border-zinc-300")}>
-                대시보드
+              <Link href={resolveMyPageHref(sessionUser.role)} className={cn(buttonVariants({ variant: "outline", size: "sm" }), "border-zinc-300")}>
+                마이페이지
               </Link>
             ) : (
               <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "border-zinc-300")}>

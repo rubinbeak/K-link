@@ -42,7 +42,7 @@ export default async function BrandInvoicePage({ params }: { params: Promise<{ p
         </div>
         <div className="flex gap-2">
           <Link href="/brand" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-            대시보드
+            마이페이지
           </Link>
           <Link href="/campaign/setup" className={cn(buttonVariants({ size: "sm" }))}>
             새 캠페인 세팅

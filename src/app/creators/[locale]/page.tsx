@@ -109,10 +109,10 @@ export default async function CreatorsLandingPage({
         </div>
       </section>
 
-      <section className="mt-16 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="rounded-3xl border border-border/70 bg-card/85 p-6 shadow-xl shadow-pink-100/40 backdrop-blur-md">
+      <section className="brand-split-relaxed mt-16 grid lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="brand-pane rounded-3xl border-border/70 bg-card/85 p-6 shadow-xl shadow-pink-100/40 backdrop-blur-md">
           <h3 className="font-heading text-xl font-semibold">{t.showcase.earningsTitle}</h3>
-          <p className="mt-2 text-sm text-muted-foreground">{t.showcase.earningsDesc}</p>
+          <p className="brand-copy-relaxed mt-2 text-sm text-muted-foreground">{t.showcase.earningsDesc}</p>
           <div className="mt-5 space-y-4">
             {[
               { label: "Nano Creator", value: 48, amount: "$620" },
@@ -131,9 +131,9 @@ export default async function CreatorsLandingPage({
             ))}
           </div>
         </div>
-        <div className="rounded-3xl border border-border/70 bg-card/85 p-6 shadow-xl shadow-pink-100/40 backdrop-blur-md">
+        <div className="brand-pane rounded-3xl border-border/70 bg-card/85 p-6 shadow-xl shadow-pink-100/40 backdrop-blur-md">
           <h3 className="font-heading text-xl font-semibold">{t.showcase.contentTitle}</h3>
-          <p className="mt-2 text-sm text-muted-foreground">{t.showcase.contentDesc}</p>
+          <p className="brand-copy-relaxed mt-2 text-sm text-muted-foreground">{t.showcase.contentDesc}</p>
           <div className="mt-5 grid grid-cols-2 gap-3">
             {["Unboxing", "Store Visit", "Skincare Tips", "Before/After"].map((format, index) => (
               <div

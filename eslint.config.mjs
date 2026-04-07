@@ -21,6 +21,13 @@ const eslintConfig = [
       "src/generated/**",
     ],
   },
+  // Clearbit 로고: next/image는 서버에서 원본을 fetch해 일부 환경(DNS/방화벽)에서 ENOTFOUND·500이 납니다. 브라우저 <img>만 사용합니다.
+  {
+    files: ["src/components/brand/partner-brand-grid.tsx"],
+    rules: {
+      "@next/next/no-img-element": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

@@ -81,6 +81,15 @@ const defaultData: CampaignDraftData = {
   },
 };
 
+const fullProcessSteps = [
+  "캠페인 세팅 및 결제",
+  "가이드라인 확정",
+  "인플루언서 리스트 전달",
+  "현장 방문 및 촬영",
+  "업로드 관리",
+  "결과 보고",
+];
+
 export function CampaignSetupWizard({
   initialDraftId,
   initialData,
@@ -108,6 +117,7 @@ export function CampaignSetupWizard({
     () => estimatePricing({ headcount: data.step3.headcount, followerTier: data.step3.followerTier }),
     [data.step3.headcount, data.step3.followerTier],
   );
+  const activeProcessIndex = step;
 
   async function saveDraft(mode: "manual" | "auto") {
     setSaving(true);
@@ -178,6 +188,10 @@ export function CampaignSetupWizard({
       setError(json.error ?? "캠페인 생성 실패");
       return;
     }
+    if (json?.paymentId) {
+      router.push(`/brand/payments/${json.paymentId}/invoice`);
+      return;
+    }
     router.push("/brand");
   }
 
@@ -190,18 +204,51 @@ export function CampaignSetupWizard({
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="space-y-6">
-        <Card className="rounded-2xl border-border/70 bg-card/85 shadow-lg shadow-pink-100/35 backdrop-blur-md">
+        <Card className="brand-panel">
           <CardHeader>
             <CardTitle className="font-heading text-2xl">캠페인 세팅하기</CardTitle>
-            <CardDescription>임시 저장 + 5분 자동 저장 + 입력 변경 시 자동 저장(10초)</CardDescription>
+            <CardDescription>
+              임시 저장 + 5분 자동 저장 + 입력 변경 시 자동 저장(10초)
+              <br />
+              프로세스 1단계인 캠페인 세팅 및 결제를 완료하는 화면입니다.
+            </CardDescription>
           </CardHeader>
         </Card>
 
-        <Card className="rounded-2xl border-border/70 bg-card/85 shadow-lg shadow-pink-100/35 backdrop-blur-md">
+        <Card className="brand-panel sticky top-20 z-10">
+          <CardHeader>
+            <CardTitle>진행 단계</CardTitle>
+            <CardDescription>총 6단계 중 현재 위치를 표시합니다. 이 화면은 1~3단계를 처리합니다.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-6 gap-2">
+              {fullProcessSteps.map((label, idx) => (
+                <div
+                  key={label}
+                  className={`h-2 rounded-full ${idx + 1 <= activeProcessIndex ? "bg-primary" : "bg-muted"}`}
+                  aria-hidden
+                />
+              ))}
+            </div>
+            <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+              {fullProcessSteps.map((label, idx) => (
+                <p key={label} className={idx + 1 === activeProcessIndex ? "font-semibold text-foreground" : ""}>
+                  {idx + 1}. {label}
+                </p>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="brand-panel">
           <CardHeader>
             <CardTitle>단계 {step}</CardTitle>
             <CardDescription>
-              {step === 1 ? "기본 정보" : step === 2 ? "장소 / 일정 / 혜택" : "인플루언서 / 플랫폼"}
+              {step === 1
+                ? "캠페인 세팅 및 결제 - 기본 정보"
+                : step === 2
+                  ? "가이드라인 확정 - 장소 / 일정 / 혜택"
+                  : "인플루언서 리스트 전달 - 타겟 / 플랫폼 / 인원"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -235,7 +282,7 @@ export function CampaignSetupWizard({
                   <Label>방문 목적 (복수)</Label>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {VISIT_GOAL_VALUES.map((goal) => (
-                      <label key={goal} className="flex items-center gap-2 rounded-md border border-border/70 px-3 py-2 text-sm">
+                      <label key={goal} className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm">
                         <input
                           type="checkbox"
                           checked={data.step1.visitGoals.includes(goal)}
@@ -355,7 +402,7 @@ export function CampaignSetupWizard({
                   <>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {BENEFIT_VALUES.map((benefit) => (
-                        <label key={benefit} className="flex items-center gap-2 rounded-md border border-border/70 px-3 py-2 text-sm">
+                        <label key={benefit} className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm">
                           <input
                             type="checkbox"
                             checked={data.step2.benefitTypes.includes(benefit)}
@@ -406,7 +453,7 @@ export function CampaignSetupWizard({
                   <Label>타겟 국가(복수)</Label>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {REGION_VALUES.map((region) => (
-                      <label key={region} className="flex items-center gap-2 rounded-md border border-border/70 px-3 py-2 text-sm">
+                      <label key={region} className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm">
                         <input
                           type="checkbox"
                           checked={data.step3.targetRegions.includes(region)}
@@ -463,7 +510,7 @@ export function CampaignSetupWizard({
                   <Label>플랫폼(복수)</Label>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {PLATFORM_VALUES.map((platform) => (
-                      <label key={platform} className="flex items-center gap-2 rounded-md border border-border/70 px-3 py-2 text-sm">
+                      <label key={platform} className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm">
                         <input
                           type="checkbox"
                           checked={data.step3.platforms.includes(platform)}
@@ -508,14 +555,29 @@ export function CampaignSetupWizard({
           </Button>
           {step === 3 ? (
             <Button type="button" onClick={finalizeCampaign} disabled={finalizing}>
-              {finalizing ? "결제 단계 생성 중..." : "결제 진행(캠페인 확정)"}
+              {finalizing ? "입금 안내 생성 중..." : "캠페인 세팅 및 결제 완료하기"}
             </Button>
           ) : null}
         </div>
       </div>
 
       <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-        <Card className="rounded-2xl border-border/70 bg-card/90 shadow-xl shadow-pink-100/45 backdrop-blur-md">
+        <Card className="brand-panel">
+          <CardHeader>
+            <CardTitle>프로세스 매핑</CardTitle>
+            <CardDescription>노출 용어를 캠페인 프로세스 페이지와 동일하게 맞췄습니다.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <p>1) 캠페인 세팅 및 결제</p>
+            <p>2) 가이드라인 확정</p>
+            <p>3) 인플루언서 리스트 전달</p>
+            <p className="text-muted-foreground">4) 현장 방문 및 촬영</p>
+            <p className="text-muted-foreground">5) 업로드 관리</p>
+            <p className="text-muted-foreground">6) 결과 보고</p>
+          </CardContent>
+        </Card>
+
+        <Card className="brand-panel">
           <CardHeader>
             <CardTitle>실시간 요약</CardTitle>
             <CardDescription>{statusText}</CardDescription>
@@ -537,6 +599,7 @@ export function CampaignSetupWizard({
               예상 총액: <span className="text-primary">{pricing.totalPrice.toLocaleString()}원</span>
             </p>
             <p className="text-xs text-muted-foreground">방문 후 7일 이내 업로드 기준으로 운영됩니다.</p>
+            <p className="text-xs text-muted-foreground">결제는 무통장입금으로 진행되며 PG 연동은 제공하지 않습니다.</p>
           </CardContent>
         </Card>
         {error ? (

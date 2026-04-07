@@ -165,10 +165,10 @@ async function main() {
     data: {
       campaignId: visitCampaign.id,
       basePriceKrw: 250000,
-      followerSurchargeKrw: 100000,
-      unitPriceKrw: 350000,
+      followerSurchargeKrw: 200000,
+      unitPriceKrw: 450000,
       headcount: 5,
-      totalPriceKrw: 1750000,
+      totalPriceKrw: 2250000,
       currency: "KRW",
     },
   });

@@ -19,6 +19,10 @@ export default async function BrandDashboardPage() {
     where: { brandId: session.user.id },
     orderBy: { createdAt: "desc" },
     include: {
+      payments: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
       applications: {
         include: { influencer: true },
         orderBy: { createdAt: "desc" },
@@ -35,8 +39,8 @@ export default async function BrandDashboardPage() {
             Review applicants, select creators, and track collaboration progress.
           </p>
         </div>
-        <Link href="/brand/campaigns/new" className={cn(buttonVariants())}>
-          New campaign
+        <Link href="/campaign/setup" className={cn(buttonVariants())}>
+          Campaign setup
         </Link>
       </div>
 
@@ -52,8 +56,8 @@ export default async function BrandDashboardPage() {
             <CardDescription>Create your first campaign to invite global creators.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/brand/campaigns/new" className={cn(buttonVariants())}>
-              Create campaign
+            <Link href="/campaign/setup" className={cn(buttonVariants())}>
+              Start campaign setup
             </Link>
           </CardContent>
         </Card>
@@ -72,6 +76,17 @@ export default async function BrandDashboardPage() {
                 <p className="text-sm text-muted-foreground">
                   Budget <span className="font-medium text-foreground">${c.budget.toLocaleString()}</span>
                 </p>
+                {c.payments[0] ? (
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <Badge variant="outline">Payment: {c.payments[0].status}</Badge>
+                    <Link
+                      href={`/brand/payments/${c.payments[0].id}/invoice`}
+                      className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      Invoice 보기
+                    </Link>
+                  </div>
+                ) : null}
               </CardHeader>
               <Separator />
               <CardContent className="pt-6">

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Noto_Sans_JP, Noto_Sans_SC } from "next/font/google";
 import { auth } from "@/auth";
 import { CreatorsLanguageSwitcher } from "@/components/creators/creators-language-switcher";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -11,18 +10,6 @@ import {
   type CreatorLocale,
 } from "@/lib/creators-i18n";
 import { cn } from "@/lib/utils";
-
-const notoSc = Noto_Sans_SC({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const notoJp = Noto_Sans_JP({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
 
 export async function generateMetadata({
   params,
@@ -62,10 +49,17 @@ export default async function CreatorsLocaleLayout({
     <div
       lang={htmlLangForCreatorLocale(locale)}
       className={cn(
-        "min-h-dvh bg-gradient-to-b from-[#f8fafc] via-background to-background dark:from-[#0f1419]",
-        locale === "zh" && notoSc.className,
-        locale === "ja" && notoJp.className,
+        "min-h-dvh bg-linear-to-b from-[#f8fafc] via-background to-background dark:from-[#0f1419]",
+        locale === "zh" && "font-sans",
+        locale === "ja" && "font-sans",
       )}
+      style={
+        locale === "zh"
+          ? { fontFamily: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Apple SD Gothic Neo", sans-serif' }
+          : locale === "ja"
+            ? { fontFamily: '"Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif' }
+            : undefined
+      }
     >
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/85 backdrop-blur-md">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-3 px-4 py-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-center lg:gap-4 lg:py-4">

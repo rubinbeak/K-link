@@ -7,7 +7,7 @@ export default function BrandLayout({ children }: { children: React.ReactNode })
         title="Brand"
         nav={[
           { href: "/brand", label: "Dashboard" },
-          { href: "/brand/campaigns/new", label: "New campaign" },
+          { href: "/campaign/setup", label: "Campaign setup" },
         ]}
       />
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>

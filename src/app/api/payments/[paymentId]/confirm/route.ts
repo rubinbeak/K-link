@@ -10,7 +10,11 @@ export async function POST(_request: Request, { params }: { params: Promise<{ pa
   const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
   if (!payment) return NextResponse.json({ error: "Payment not found" }, { status: 404 });
 
-  if (authResult.session.user.role === "BRAND" && payment.brandId !== authResult.session.user.id) {
+  const role = authResult.session.user.role;
+  if (role !== "ADMIN" && role !== "BRAND") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (role === "BRAND" && payment.brandId !== authResult.session.user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

@@ -9,10 +9,10 @@ export default async function AuthRedirectPage() {
     case "BRAND":
       redirect("/brand");
     case "INFLUENCER":
-      redirect("/influencer/feed");
+      redirect("/for-brands");
     case "ADMIN":
       redirect("/admin");
     default:
-      redirect("/");
+      redirect("/for-brands");
   }
 }

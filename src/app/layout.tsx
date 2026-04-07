@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Noto_Sans_KR, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
+import { TopNavigationBar } from "@/components/layout/top-navigation-bar";
 
 const dmSans = DM_Sans({
   variable: "--font-dm",
@@ -39,9 +40,12 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${dmSans.variable} ${notoKr.variable} ${geistMono.variable} min-h-dvh antialiased`}
+        className={`${dmSans.variable} ${notoKr.variable} ${geistMono.variable} min-h-dvh overflow-x-hidden antialiased`}
       >
-        <AuthSessionProvider>{children}</AuthSessionProvider>
+        <AuthSessionProvider>
+          <TopNavigationBar />
+          {children}
+        </AuthSessionProvider>
       </body>
     </html>
   );

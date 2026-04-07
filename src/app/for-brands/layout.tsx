@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function ForBrandsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div lang="ko" className="min-h-dvh bg-gradient-to-b from-[#fdf8f6] via-background to-background">
+    <div lang="ko" className="brand-site min-h-dvh overflow-x-hidden">
       {children}
     </div>
   );

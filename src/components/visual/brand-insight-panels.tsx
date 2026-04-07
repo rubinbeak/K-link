@@ -2,8 +2,8 @@ import { BarChart3, CalendarClock, Globe2 } from "lucide-react";
 
 export function BrandInsightPanels() {
   return (
-    <div className="grid gap-5 lg:grid-cols-3">
-      <div className="rounded-2xl border border-border/70 bg-card/85 p-5 shadow-lg shadow-pink-100/40 backdrop-blur-md">
+    <div className="grid w-full gap-5 lg:grid-cols-3">
+      <div className="brand-panel-muted p-5">
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
           <BarChart3 className="size-4 text-primary" />
           캠페인 진행 현황
@@ -27,7 +27,7 @@ export function BrandInsightPanels() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/70 bg-card/85 p-5 shadow-lg shadow-pink-100/40 backdrop-blur-md">
+      <div className="brand-panel-muted p-5">
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
           <Globe2 className="size-4 text-primary" />
           국가별 비중 예시
@@ -61,7 +61,7 @@ export function BrandInsightPanels() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/70 bg-card/85 p-5 shadow-lg shadow-pink-100/40 backdrop-blur-md">
+      <div className="brand-panel-muted p-5">
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
           <CalendarClock className="size-4 text-primary" />
           일정 타임라인 예시

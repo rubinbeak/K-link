@@ -4,117 +4,140 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Calculator, Sparkles } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { brandPrimaryCtaLabel } from "@/lib/brand-marketing-copy";
 import { cn } from "@/lib/utils";
 
-type Tier = "LTE_5K" | "BETWEEN_5K_30K" | "GTE_30K";
-
-const tierLabel: Record<Tier, string> = {
-  LTE_5K: "팔로워 5천 이하",
-  BETWEEN_5K_30K: "팔로워 5천 ~ 3만",
-  GTE_30K: "팔로워 3만 이상",
-};
-
-const surchargeByTier: Record<Tier, number> = {
-  LTE_5K: 0,
-  BETWEEN_5K_30K: 100000,
-  GTE_30K: 200000,
-};
+const UNIT_LTE_5K = 250_000;
+const UNIT_GTE_5K = 500_000;
 
 const money = new Intl.NumberFormat("ko-KR");
 
+const SLIDER_MAX = 30;
+
 export function BrandBudgetCalculator() {
-  const [headcount, setHeadcount] = useState(8);
-  const [tier, setTier] = useState<Tier>("BETWEEN_5K_30K");
+  const [under5k, setUnder5k] = useState(4);
+  const [over5k, setOver5k] = useState(2);
 
   const price = useMemo(() => {
-    const base = 250000;
-    const surcharge = surchargeByTier[tier];
-    const unit = base + surcharge;
+    const subUnder = under5k * UNIT_LTE_5K;
+    const subOver = over5k * UNIT_GTE_5K;
     return {
-      base,
-      surcharge,
-      unit,
-      headcount,
-      total: unit * headcount,
+      under5k,
+      over5k,
+      subUnder,
+      subOver,
+      total: subUnder + subOver,
+      headcount: under5k + over5k,
     };
-  }, [headcount, tier]);
+  }, [under5k, over5k]);
 
   return (
-    <section className="rounded-3xl border border-primary/25 bg-linear-to-r from-white via-pink-50 to-fuchsia-100/70 p-6 shadow-xl shadow-pink-100/45">
+    <section className="brand-panel relative overflow-hidden p-6">
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-primary/10 via-transparent to-transparent" />
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="inline-flex items-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+        <div className="relative">
+          <p className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
             <Calculator className="size-3.5" />
             즉시 예산 계산
           </p>
           <h3 className="mt-3 font-heading text-2xl font-semibold tracking-tight">캠페인 예상 비용을 바로 확인해보세요</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            인원 수와 크리에이터 구간만 선택하면 예상 총액이 실시간으로 계산됩니다.
+            팔로워 <span className="font-medium text-foreground">5천 이하</span> 인원과{" "}
+            <span className="font-medium text-foreground">5천 이상</span> 인원을 각각 조절하면 복합 플랜도 한 번에 합산됩니다.
           </p>
         </div>
-        <span className="inline-flex items-center gap-1 rounded-full border border-primary/25 bg-white/80 px-2.5 py-1 text-xs font-medium text-primary">
+        <span className="relative inline-flex items-center gap-1 rounded-full bg-background px-2.5 py-1 text-xs font-medium text-primary">
           <Sparkles className="size-3.5" />
           실시간 계산
         </span>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_0.95fr]">
-        <div className="space-y-4 rounded-2xl border border-white/80 bg-white/70 p-4">
-          <label className="block text-sm font-medium">
-            모집 인원
-            <span className="ml-2 text-primary">{headcount}명</span>
-          </label>
-          <input
-            type="range"
-            min={1}
-            max={30}
-            value={headcount}
-            onChange={(e) => setHeadcount(Number(e.target.value))}
-            className="w-full accent-primary"
-          />
-          <div className="grid gap-2 text-sm sm:grid-cols-3">
-            {(Object.keys(tierLabel) as Tier[]).map((key) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setTier(key)}
-                className={cn(
-                  "rounded-xl border px-3 py-2 text-left transition",
-                  tier === key
-                    ? "border-primary/40 bg-primary/10 text-foreground"
-                    : "border-border/70 bg-background/80 text-muted-foreground hover:border-primary/25 hover:text-foreground",
-                )}
-              >
-                {tierLabel[key]}
-              </button>
-            ))}
+      <div className="relative mt-6 grid gap-4 lg:grid-cols-[1fr_0.95fr]">
+        <div className="space-y-4">
+          <div className="brand-panel-muted border border-border/40 p-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <label className="text-sm font-medium text-foreground">팔로워 5천 이하</label>
+              <span className="text-sm tabular-nums text-muted-foreground">
+                <span className="font-semibold text-primary">{under5k}명</span>
+                <span className="mx-1.5 text-border">·</span>
+                인당 {money.format(UNIT_LTE_5K)}원
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={SLIDER_MAX}
+              value={under5k}
+              onChange={(e) => setUnder5k(Number(e.target.value))}
+              className="mt-3 w-full accent-primary"
+              aria-valuetext={`${under5k}명`}
+            />
+            <p className="mt-2 text-xs text-muted-foreground">해당 구간만 쓰는 경우 이 바만 조절하면 됩니다.</p>
+          </div>
+
+          <div className="brand-panel-muted border border-border/40 p-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <label className="text-sm font-medium text-foreground">팔로워 5천 이상</label>
+              <span className="text-sm tabular-nums text-muted-foreground">
+                <span className="font-semibold text-primary">{over5k}명</span>
+                <span className="mx-1.5 text-border">·</span>
+                인당 {money.format(UNIT_GTE_5K)}원
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={SLIDER_MAX}
+              value={over5k}
+              onChange={(e) => setOver5k(Number(e.target.value))}
+              className="mt-3 w-full accent-fuchsia-500"
+              aria-valuetext={`${over5k}명`}
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              5천 이상 구간은 1인 기준 {money.format(UNIT_GTE_5K)}원 단가가 적용됩니다.
+            </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm">
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p className="flex items-center justify-between">
-              <span>기본 단가</span>
-              <span className="font-medium text-foreground">{money.format(price.base)}원</span>
-            </p>
-            <p className="flex items-center justify-between">
-              <span>팔로워 구간 추가금</span>
-              <span className="font-medium text-foreground">+{money.format(price.surcharge)}원</span>
-            </p>
-            <p className="flex items-center justify-between border-t border-border/60 pt-2">
-              <span>1인 단가</span>
-              <span className="font-semibold text-foreground">{money.format(price.unit)}원</span>
-            </p>
+        <div className="rounded-xl bg-primary px-4 py-4 text-primary-foreground shadow-sm">
+          <div className="space-y-2 text-sm">
+            {under5k > 0 && (
+              <p className="flex items-center justify-between gap-2 text-primary-foreground/90">
+                <span>5천 이하 × {under5k}명</span>
+                <span className="shrink-0 font-medium tabular-nums">{money.format(price.subUnder)}원</span>
+              </p>
+            )}
+            {over5k > 0 && (
+              <p className="flex items-center justify-between gap-2 text-primary-foreground/90">
+                <span>5천 이상 × {over5k}명</span>
+                <span className="shrink-0 font-medium tabular-nums">{money.format(price.subOver)}원</span>
+              </p>
+            )}
+            {price.headcount === 0 && (
+              <p className="text-primary-foreground/75">슬라이더로 인원을 선택하면 금액이 표시됩니다.</p>
+            )}
+            {price.headcount > 0 && (
+              <p className="flex items-center justify-between border-t border-white/20 pt-2 text-primary-foreground/90">
+                <span>모집 합계</span>
+                <span className="font-semibold tabular-nums">{price.headcount}명</span>
+              </p>
+            )}
           </div>
-          <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-4">
-            <p className="text-xs text-muted-foreground">예상 총액 ({price.headcount}명 기준)</p>
-            <p className="mt-1 text-2xl font-semibold tracking-tight text-primary">{money.format(price.total)}원</p>
+          <div className="mt-4 rounded-lg bg-white/12 p-4">
+            <p className="text-xs text-primary-foreground/80">예상 총액</p>
+            <p className="mt-1 text-3xl font-semibold tracking-tight text-white tabular-nums">{money.format(price.total)}원</p>
           </div>
           <div className="mt-4 flex gap-2">
-            <Link href="/campaign/setup" className={cn(buttonVariants({ size: "sm" }), "flex-1")}>
-              이 조건으로 세팅 시작
+            <Link href="/campaign/setup" className={cn(buttonVariants({ size: "sm" }), "flex-1 bg-white text-center text-xs font-semibold leading-snug text-primary hover:bg-white/90 sm:text-sm")}>
+              {brandPrimaryCtaLabel}
             </Link>
-            <Link href="/consulting" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "flex-1")}>
+            <Link
+              href="/consulting"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "flex-1 border-white/60 bg-transparent text-white hover:bg-white/10 hover:text-white",
+              )}
+            >
               상담 요청
             </Link>
           </div>

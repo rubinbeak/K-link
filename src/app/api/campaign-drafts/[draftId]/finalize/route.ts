@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/api-auth";
 import { calculateSchedule, estimatePricing } from "@/lib/visit-campaign";
+import { toInvoiceNumber } from "@/lib/invoice";
 
 type DraftData = {
   step1?: {
@@ -172,7 +173,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ dr
       },
     });
 
-    await tx.payment.create({
+    const payment = await tx.payment.create({
       data: {
         brandId: authResult.session.user.id,
         campaignId: campaign.id,
@@ -186,12 +187,14 @@ export async function POST(_request: Request, { params }: { params: Promise<{ dr
       data: { isFinalized: true },
     });
 
-    return campaign;
+    return { campaign, payment };
   });
 
   return NextResponse.json({
-    campaignId: result.id,
+    campaignId: result.campaign.id,
+    paymentId: result.payment.id,
     status: "READY_FOR_PAYMENT",
     totalPrice: pricing.totalPrice,
+    invoiceNumber: toInvoiceNumber(result.payment.id, result.payment.createdAt),
   });
 }

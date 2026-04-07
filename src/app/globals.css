@@ -81,6 +81,27 @@
   --sidebar-accent-foreground: oklch(0.3 0.05 334);
   --sidebar-border: oklch(0.9 0.028 342);
   --sidebar-ring: oklch(0.72 0.16 350);
+
+  /* Brand design system tokens — 와이드 모니터에서도 콘텐츠가 너무 좁아 보이지 않게 상한 완화 */
+  --brand-content-max: 1920px;
+  --brand-radius-sm: 0.625rem;
+  --brand-radius-md: 0.875rem;
+  --brand-radius-lg: 1rem;
+  --brand-shadow-soft: 0 1px 2px 0 oklch(0.26 0.02 330 / 0.08);
+  --brand-shadow-raised: 0 8px 24px -12px oklch(0.26 0.02 330 / 0.14);
+  --brand-surface-1: color-mix(in oklab, var(--background) 92%, var(--muted));
+  --brand-surface-2: color-mix(in oklab, var(--background) 86%, var(--muted));
+  --brand-surface-3: color-mix(in oklab, var(--background) 78%, var(--muted));
+  --brand-border-soft: color-mix(in oklab, var(--border) 68%, transparent);
+  --brand-border-strong: color-mix(in oklab, var(--border) 90%, transparent);
+  --brand-space-2: 0.5rem;
+  --brand-space-3: 0.75rem;
+  --brand-space-4: 1rem;
+  --brand-space-6: 1.5rem;
+  --brand-space-8: 2rem;
+  --brand-space-10: 2.5rem;
+  --brand-space-12: 3rem;
+  --brand-space-16: 4rem;
 }
 
 .dark {
@@ -131,5 +152,166 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  .brand-site {
+    --brand-content-padding: clamp(0.75rem, 1.5vw, 1.25rem);
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--background) 94%, var(--muted)) 0%,
+      var(--background) 34%
+    );
+  }
+
+  .brand-container {
+    box-sizing: border-box;
+    width: min(100% - (var(--brand-content-padding) * 2), var(--brand-content-max));
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  .brand-section {
+    padding-block: var(--brand-space-12);
+  }
+
+  .brand-section-tight {
+    padding-block: var(--brand-space-8);
+  }
+
+  .brand-rule {
+    border-color: var(--brand-border-soft);
+  }
+
+  .brand-panel {
+    border: 1px solid var(--brand-border-soft);
+    border-radius: var(--brand-radius-lg);
+    background: var(--brand-surface-1);
+    box-shadow: var(--brand-shadow-soft);
+  }
+
+  .brand-panel-muted {
+    border-radius: var(--brand-radius-md);
+    background: var(--brand-surface-2);
+  }
+
+  .brand-kpi-divider > * + * {
+    border-left: 1px solid var(--brand-border-soft);
+  }
+
+  .brand-step {
+    border-radius: var(--brand-radius-md);
+    background: var(--brand-surface-2);
+  }
+
+  .brand-timeline {
+    border-left: 1px solid var(--brand-border-soft);
+  }
+
+  .brand-timeline-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 9999px;
+    background: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 12%, transparent);
+  }
+
+  .brand-hero-cta {
+    border-radius: var(--brand-radius-lg);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: var(--brand-shadow-raised);
+  }
+
+  .brand-marquee {
+    overflow: hidden;
+    position: relative;
+    max-width: 100%;
+    mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+  }
+
+  .brand-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: brand-marquee 34s linear infinite;
+  }
+
+  .brand-marquee-slow .brand-marquee-track {
+    animation-duration: 46s;
+  }
+
+  .brand-marquee-reverse .brand-marquee-track {
+    animation-direction: reverse;
+  }
+
+  .brand-split-relaxed {
+    gap: var(--brand-space-8);
+  }
+
+  @media (min-width: 1024px) {
+    .brand-split-relaxed {
+      gap: clamp(2.5rem, 4vw, 4rem);
+    }
+  }
+
+  .brand-pane {
+    border: 1px solid var(--brand-border-soft);
+    border-radius: var(--brand-radius-md);
+    background: color-mix(in oklab, var(--background) 96%, var(--muted));
+    padding: clamp(1rem, 1.8vw, 1.5rem);
+  }
+
+  .brand-copy-relaxed {
+    max-width: 38ch;
+    line-height: 1.85;
+  }
+
+  .brand-hero-globe {
+    animation: brand-hero-orbit 18s linear infinite;
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.12),
+      inset -28px 0 52px rgb(244 63 94 / 0.2),
+      inset 24px 0 50px rgb(56 189 248 / 0.22);
+  }
+
+  .brand-hero-country-chip {
+    animation: brand-hero-float 5.4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-hero-globe,
+    .brand-hero-country-chip {
+      animation: none;
+    }
+  }
+}
+
+@keyframes brand-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes brand-hero-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes brand-hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
   }
 }

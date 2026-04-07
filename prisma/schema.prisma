@@ -125,6 +125,7 @@ model User {
   instagram String?
   tiktok    String?
   brandName String?
+  contactPhoneE164 String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -101,9 +101,10 @@ export const platformLabel: Record<(typeof PLATFORM_VALUES)[number], string> = {
   OTHER: "기타",
 };
 
+/** 기본 25만원 기준 팔로워 구간 추가금 (5천 초과 구간은 +20만 → 인당 45만) */
 const moneyByFollowerTier: Record<(typeof FOLLOWER_TIER_VALUES)[number], number> = {
   LTE_5K: 0,
-  BETWEEN_5K_30K: 100000,
+  BETWEEN_5K_30K: 200000,
   GTE_30K: 200000,
 };
 

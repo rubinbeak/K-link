@@ -24,13 +24,14 @@ export default async function middleware(req: NextRequest) {
   });
   const path = req.nextUrl.pathname;
   const fullPath = `${path}${req.nextUrl.search}`;
+  const role = token?.role;
 
   const requiresBrandAuth = BRAND_AUTH_REQUIRED_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
-  if (requiresBrandAuth && !token?.role) {
+  if (requiresBrandAuth && !role) {
     return NextResponse.redirect(new URL(`/login?callbackUrl=${encodeURIComponent(fullPath)}`, req.url));
   }
-  if (requiresBrandAuth && token.role !== "BRAND") {
-    return NextResponse.redirect(new URL(homeForRole(String(token.role)), req.url));
+  if (requiresBrandAuth && role && role !== "BRAND") {
+    return NextResponse.redirect(new URL(homeForRole(String(role)), req.url));
   }
 
   /* 브랜드 전용 공개 단계: 크리에이터/인플루언서 공개 라우트 비노출 (추후 제거 가능) */

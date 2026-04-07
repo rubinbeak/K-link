@@ -86,7 +86,7 @@ export function CampaignProcessDetailDashboard({ steps }: { steps: readonly Proc
       if (i === active) return "active" as const;
       return "pending" as const;
     });
-  }, [active, steps.length]);
+  }, [active, steps]);
 
   const meta = stepOpsMeta[active] ?? stepOpsMeta[0];
   const current = steps[active];

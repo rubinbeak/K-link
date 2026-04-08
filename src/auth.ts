@@ -25,7 +25,10 @@ const providers = [
       const password = credentials?.password as string | undefined;
       if (!email || !password) return null;
 
-      const user = await prisma.user.findUnique({ where: { email } });
+      const user = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true, email: true, name: true, role: true, password: true },
+      });
       if (!user?.password) return null;
 
       const valid = await compare(password, user.password);
@@ -49,7 +52,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider !== "google" || !user.email) return true;
-      const existing = await prisma.user.findUnique({ where: { email: user.email } });
+      const existing = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { id: true },
+      });
       if (!existing) {
         await prisma.user.create({
           data: {
@@ -65,7 +71,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const email = user?.email ?? token.email;
       if (!email) return token;
 
-      const dbUser = await prisma.user.findUnique({ where: { email } });
+      const dbUser = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true, email: true, name: true, role: true },
+      });
       if (dbUser) {
         token.id = dbUser.id;
         token.role = dbUser.role;

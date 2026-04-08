@@ -29,7 +29,7 @@ export function BrandFloatingSetupCta({ label }: { label: string }) {
   return (
     <div
       className={cn(
-        "fixed bottom-4 left-1/2 z-30 w-[calc(100%-1.25rem)] max-w-lg transition-all duration-300 sm:bottom-6",
+        "fixed bottom-3 left-1/2 z-30 w-[calc(100%-2rem)] max-w-xs transition-all duration-300 sm:bottom-4 sm:max-w-sm",
         visible ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       style={{
@@ -39,12 +39,12 @@ export function BrandFloatingSetupCta({ label }: { label: string }) {
       <Link
         href="/campaign/setup"
         className={cn(
-          buttonVariants({ size: "lg" }),
-          "flex w-full items-center justify-center gap-2 bg-[#ff2f9b] px-4 text-white shadow-lg hover:bg-[#e61c8d]",
+          buttonVariants({ size: "default" }),
+          "flex h-10 w-full items-center justify-center gap-1.5 bg-[#ff2f9b] px-3 text-sm text-white shadow-md hover:bg-[#e61c8d] sm:h-11",
         )}
       >
-        <span className="text-center text-sm font-semibold leading-snug">{label}</span>
-        <ArrowRight className="size-4 shrink-0" />
+        <span className="text-center text-xs font-semibold leading-snug sm:text-sm">{label}</span>
+        <ArrowRight className="size-3.5 shrink-0 sm:size-4" />
       </Link>
     </div>
   );

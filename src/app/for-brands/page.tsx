@@ -10,16 +10,21 @@ import {
   CreditCard,
   FileBarChart,
   FileText,
+  Frame,
   GitBranch,
+  Hospital,
   MapPinned,
   Package,
   Radar,
   Share2,
+  Store,
+  Tent,
   TrendingUp,
   Users,
+  UtensilsCrossed,
   Video,
 } from "lucide-react";
-import { BrandBudgetCalculator } from "@/components/brand/brand-budget-calculator";
+import { BrandPricingGuide } from "@/components/brand/brand-pricing-guide";
 import { BrandFloatingSetupCta } from "@/components/brand/brand-floating-setup-cta";
 import { BrandImpactHero } from "@/components/brand/brand-impact-hero";
 import { BrandReferenceVideoGallery } from "@/components/brand/brand-reference-video-gallery";
@@ -202,13 +207,13 @@ const visitContentPackageItems: readonly { text: string; line2?: string; Icon: L
   { text: "방문 후 7일 이내 업로드 운영", Icon: CalendarClock },
   { text: "결과 보고 · 2차 활용 가능", Icon: FileBarChart },
 ];
-/** 방문 채널 칩 — 이모지 + 톤별 색 (핑크 단일 톤 비사용) */
-const visitSpecialtyChips: readonly { label: string; emoji: string; chipClass: string }[] = [
-  { label: "매장/팝업스토어", emoji: "🏪", chipClass: "border-amber-400/55 bg-amber-50 text-amber-950 hover:bg-amber-100/90" },
-  { label: "행사 / 부스", emoji: "🎪", chipClass: "border-sky-400/50 bg-sky-50 text-sky-950 hover:bg-sky-100/90" },
-  { label: "병원 / 클리닉", emoji: "🏥", chipClass: "border-emerald-400/50 bg-emerald-50 text-emerald-950 hover:bg-emerald-100/90" },
-  { label: "쇼룸 / 전시", emoji: "🖼️", chipClass: "border-indigo-400/50 bg-indigo-50 text-indigo-950 hover:bg-indigo-100/90" },
-  { label: "레스토랑 / F&B", emoji: "🍽️", chipClass: "border-orange-400/50 bg-orange-50 text-orange-950 hover:bg-orange-100/90" },
+/** 방문 채널 — 포함 범위·운영 카드와 동일한 라인 아이콘 톤 */
+const visitSpecialtyChips: readonly { label: string; Icon: LucideIcon }[] = [
+  { label: "매장/팝업스토어", Icon: Store },
+  { label: "행사 / 부스", Icon: Tent },
+  { label: "병원 / 클리닉", Icon: Hospital },
+  { label: "쇼룸 / 전시", Icon: Frame },
+  { label: "레스토랑 / F&B", Icon: UtensilsCrossed },
 ];
 const visitOperationsItems: readonly { text: string; Icon: LucideIcon }[] = [
   { text: "인플루언서 섭외 · 방문 일정 조율", Icon: Users },
@@ -216,7 +221,7 @@ const visitOperationsItems: readonly { text: string; Icon: LucideIcon }[] = [
   { text: "성과·링크 정리 후 보고서 전달", Icon: ClipboardList },
 ];
 const urgencyPoints = ["캠페인 세팅 즉시 시작", "무통장입금 확인 후 빠른 착수", "프로세스 6단계 가시화로 손쉬운 보고"];
-/** 메인 랜딩 — 4단계 플로우(스캔용 초단문 + 아이콘). 상세는 /for-brands/process */
+/** 메인 랜딩 — 4단계 플로우(스캔용 초단문 + 아이콘) */
 const campaignProcessMacroSteps: readonly { title: string; body: string; Icon: LucideIcon }[] = [
   {
     title: "캠페인 세팅",
@@ -225,17 +230,17 @@ const campaignProcessMacroSteps: readonly { title: string; body: string; Icon: L
   },
   {
     title: "결제·확정",
-    body: "세팅 내용을 확정한 뒤 입금하면 캠페인이 확정됩니다.",
+    body: "세팅 내용을 확정한 뒤 입금하면\n캠페인이 확정됩니다",
     Icon: CreditCard,
   },
   {
     title: "캠페인 진행",
-    body: "가이드·섭외·방문·업로드까지 운영팀이 맞춥니다.",
+    body: "가이드 섭외 방문 업로드까지\n운영팀이 케어합니다",
     Icon: GitBranch,
   },
   {
     title: "결과 보고",
-    body: "게시 링크와 핵심 지표를 리포트로 전달합니다.",
+    body: "업로드된 영상 링크와 핵심 지표를\n리포트로 전달합니다",
     Icon: FileBarChart,
   },
 ];
@@ -248,9 +253,9 @@ const previewSidebarItems = [
 ];
 export default function ForBrandsPage() {
   return (
-    <div className="relative min-h-dvh bg-white text-zinc-900">
+    <div className="relative min-h-dvh w-full min-w-0 bg-linear-to-b from-fuchsia-50/45 via-rose-50/20 to-sky-50/25 text-zinc-900">
       <BrandImpactHero fullScreen />
-      <main className="brand-container relative overflow-x-hidden pb-(--brand-space-12)">
+      <main className="brand-container relative min-w-0 overflow-x-clip pb-(--brand-space-12)">
         <section className="mt-0 w-full pt-16 text-center sm:pt-24 md:pt-28 lg:pt-32">
           <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 md:px-8">
             <p className="text-base font-bold tracking-[0.2em] text-primary sm:text-lg md:text-xl lg:text-2xl">
@@ -268,7 +273,7 @@ export default function ForBrandsPage() {
               브랜드
             </h2>
           </div>
-          <div className="relative left-1/2 mt-12 w-screen -translate-x-1/2 overflow-hidden border-y border-zinc-200/80 bg-linear-to-r from-zinc-50 via-white to-zinc-50 py-6 shadow-[0_18px_44px_-22px_rgba(0,0,0,0.2)] sm:mt-14 sm:py-7 md:mt-16 md:py-8">
+          <div className="relative mt-12 w-screen max-w-[100vw] shrink-0 overflow-hidden bg-fuchsia-50/55 pt-6 pb-14 mx-[calc(50%-50vw)] sm:mt-14 sm:pt-7 sm:pb-16 md:mt-16 md:pb-20 md:pt-8">
             <div className="px-2 sm:px-4 md:px-6">
               <PartnerBrandMarquee partners={partnerBrandsRowForward} className="mt-0" speed="slow" />
               <PartnerBrandMarquee partners={partnerBrandsRowReverse} reverse className="mt-3 sm:mt-4" />
@@ -276,8 +281,8 @@ export default function ForBrandsPage() {
           </div>
         </section>
 
-        <section className="relative mt-10 w-screen max-w-none -translate-x-1/2 left-1/2">
-          <div className="relative flex min-h-[min(58vh,640px)] flex-col justify-center overflow-hidden bg-zinc-950 px-5 py-16 text-center text-white sm:min-h-[min(56vh,680px)] sm:px-8 sm:py-20 md:min-h-[min(54vh,720px)] md:py-24 lg:py-28">
+        <section className="relative w-screen max-w-[100vw] shrink-0 mx-[calc(50%-50vw)]">
+          <div className="relative -mt-px flex min-h-[min(58vh,640px)] flex-col justify-center overflow-hidden bg-zinc-950 px-5 py-16 text-center text-white sm:min-h-[min(56vh,680px)] sm:px-8 sm:py-20 md:min-h-[min(54vh,720px)] md:py-24 lg:py-28">
             <Image
               src="https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg?auto=compress&cs=tinysrgb&w=1920"
               alt=""
@@ -290,7 +295,6 @@ export default function ForBrandsPage() {
               className="pointer-events-none absolute inset-0 bg-linear-to-b from-zinc-950/88 via-zinc-950/78 to-zinc-950/92"
               aria-hidden
             />
-            <div className="pointer-events-none absolute -left-16 top-0 h-48 w-48 rounded-full bg-fuchsia-500/25 blur-3xl" aria-hidden />
             <div className="pointer-events-none absolute -right-20 bottom-0 h-56 w-56 rounded-full bg-sky-400/20 blur-3xl" aria-hidden />
             <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col justify-center px-3 sm:px-6">
               <h2 className="font-heading text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
@@ -304,9 +308,9 @@ export default function ForBrandsPage() {
               </p>
             </div>
           </div>
-          <div className="relative z-10 -mt-px overflow-hidden leading-none text-white">
+          <div className="relative z-10 -mt-px overflow-hidden leading-none text-fuchsia-50">
             <svg
-              className="block h-10 w-full text-white sm:h-14 md:h-16"
+              className="block h-10 w-full sm:h-14 md:h-16"
               viewBox="0 0 1440 56"
               preserveAspectRatio="none"
               aria-hidden
@@ -317,14 +321,22 @@ export default function ForBrandsPage() {
               />
             </svg>
           </div>
-          <div className="relative z-10 bg-linear-to-r from-fuchsia-50/95 via-white to-sky-50/90 px-4 py-6 text-center shadow-[0_12px_40px_-28px_rgba(236,72,153,0.35)] sm:py-8">
-            <p className="mx-auto max-w-4xl bg-linear-to-r from-primary via-fuchsia-600 to-primary bg-clip-text font-heading text-2xl font-extrabold tracking-tight text-transparent drop-shadow-[0_1px_0_rgba(255,255,255,0.85)] sm:text-3xl md:text-4xl">
-              K-LINK는 이렇게 실천합니다
+          <div className="relative z-10 bg-fuchsia-50/55 px-4 pt-10 pb-6 text-center sm:pt-12 sm:pb-8 md:pt-16 md:pb-10 lg:pt-20 lg:pb-12">
+            <h2 className="mx-auto max-w-5xl text-balance font-heading text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
+              <span className="block bg-linear-to-r from-primary via-fuchsia-600 to-primary bg-clip-text text-transparent leading-[1.2] sm:leading-[1.22]">
+                성공적인 오프라인 브랜딩
+              </span>
+              <span className="mt-5 block bg-linear-to-r from-primary via-fuchsia-600 to-primary bg-clip-text text-transparent leading-[1.2] sm:mt-6 sm:leading-[1.22] md:mt-7">
+                K-link의 디테일은 다릅니다
+              </span>
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-zinc-600 sm:mt-8 sm:text-lg md:text-xl">
+              방문 캠페인의 모든 과정을 K-link가 올인원으로 해결해 드립니다.
             </p>
           </div>
         </section>
 
-        <section className="brand-section-tight mt-6 w-full">
+        <section className="brand-section-tight mt-2 w-full sm:mt-3 md:mt-4">
           <div className="mx-auto grid w-full max-w-6xl gap-6 px-1 sm:px-0 lg:grid-cols-3 lg:items-stretch lg:gap-7">
             <div className="flex h-full min-h-0 flex-col rounded-2xl border border-zinc-200/85 bg-white p-6 shadow-[0_22px_50px_-36px_rgba(15,23,42,0.28)] ring-1 ring-black/4 sm:p-8">
               <div className="flex items-start gap-3 text-left">
@@ -366,24 +378,19 @@ export default function ForBrandsPage() {
                   <p className="mt-2 text-base leading-relaxed text-zinc-500 sm:text-lg">대표 장소 유형</p>
                 </div>
               </div>
-              <div className="mt-8 flex flex-1 flex-col justify-center sm:mt-10">
-                <div className="flex flex-wrap gap-3 sm:gap-3.5">
-                  {visitSpecialtyChips.map(({ label, emoji, chipClass }) => (
-                    <span
-                      key={label}
-                      className={cn(
-                        "inline-flex items-center gap-2 rounded-2xl border-2 px-3.5 py-2.5 text-base font-semibold shadow-sm transition-[transform,box-shadow] duration-200 hover:shadow-md active:scale-[0.98] sm:px-4 sm:py-3 sm:text-lg",
-                        chipClass,
-                      )}
-                    >
-                      <span className="select-none text-xl leading-none sm:text-2xl" aria-hidden>
-                        {emoji}
-                      </span>
-                      {label}
+              <ul className="mt-7 flex flex-1 flex-col justify-center space-y-4 text-left sm:mt-8 sm:space-y-[1.15rem]">
+                {visitSpecialtyChips.map(({ label, Icon }) => (
+                  <li
+                    key={label}
+                    className="flex gap-3.5 text-[0.9375rem] leading-relaxed text-zinc-800 sm:text-base sm:leading-[1.65]"
+                  >
+                    <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-fuchsia-50 text-primary sm:size-10">
+                      <Icon className="size-4 sm:size-4.5" strokeWidth={2} aria-hidden />
                     </span>
-                  ))}
-                </div>
-              </div>
+                    <span className="min-w-0 pt-0.5 font-medium">{label}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div className="flex h-full min-h-0 flex-col rounded-2xl border border-zinc-200/85 bg-white p-6 shadow-[0_22px_50px_-36px_rgba(15,23,42,0.28)] ring-1 ring-black/4 sm:p-8">
@@ -430,11 +437,11 @@ export default function ForBrandsPage() {
             <div className="mx-auto max-w-5xl text-center lg:max-w-6xl">
               <p className="text-xs font-semibold tracking-[0.14em] text-primary">REFERENCE VIDEO</p>
               <h3 className="mt-2 font-heading text-xl font-bold tracking-tight text-zinc-900 sm:text-2xl">
-                실제 운영 레퍼런스 영상
+                현장 레퍼런스 영상
               </h3>
               <p className="mx-auto mt-3 max-w-2xl text-balance text-sm leading-relaxed text-zinc-600">
-                브랜드 메시지가 가장 자연스럽게 소비자 경험으로 이어지도록,
-                실제 방문형 콘텐츠 동선과 현장 반응을 기준으로 선별한 레퍼런스입니다.
+                실제 방문형 콘텐츠 동선과 현장 반응을 기준으로 <br/>   
+                메시지가 경험으로 전환되는 사례를 선별했습니다.
               </p>
             </div>
             <BrandReferenceVideoGallery videos={brandReferenceTikTokVideos} />
@@ -500,33 +507,13 @@ export default function ForBrandsPage() {
                 <p className="mt-1 text-[11px] text-zinc-200/85">후보 스코어링과 실행 단계를 같은 화면 언어로 맞춥니다.</p>
               </div>
             </div>
-            <div className="mx-auto mt-10 flex w-full max-w-2xl flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-4">
-              <Link
-                href="/campaign/setup"
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "bg-[#ff2f9b] px-5 text-white shadow-sm hover:bg-[#e61c8d] sm:min-h-11",
-                )}
-              >
-                <span className="text-center text-sm font-semibold leading-snug">{brandPrimaryCtaLabel}</span>
-              </Link>
-              <Link
-                href="/services/visit-content"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "lg" }),
-                  "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50",
-                )}
-              >
-                {brandServiceOutlineLabel}
-              </Link>
-            </div>
           </div>
         </section>
 
         <section className="mt-24 w-full">
           <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-2xl border border-zinc-200/90 bg-stone-50/40">
             <div className="border-b border-zinc-200/80 px-5 py-3 text-center sm:text-left">
-              <p className="text-xs text-zinc-500">K-LINK · 캠페인 운영 미리보기</p>
+              <p className="text-xs text-zinc-500">K-LINK · 캠페인 운영 미리보기 예시</p>
             </div>
             <div className="flex flex-col lg:flex-row">
               <div className="hidden w-52 shrink-0 border-r border-zinc-200/80 p-5 lg:block">
@@ -550,26 +537,28 @@ export default function ForBrandsPage() {
               </div>
               <div className="grid flex-1 gap-5 bg-white/40 p-5 lg:grid-cols-[1fr_1fr_0.85fr]">
               <div className="rounded-xl border border-zinc-200/90 bg-white p-5">
-                <p className="text-[11px] font-semibold tracking-[0.12em] text-zinc-600">한눈에 보는 캠페인 마이페이지</p>
+                <p className="text-[11px] font-semibold tracking-[0.12em] text-zinc-600">캠페인 운영 개요</p>
                 <h3 className="mt-2 max-w-3xl text-balance break-keep font-heading text-xl font-bold leading-[1.2] tracking-tight text-zinc-900">
-                  실행 전 성과 가능성을 확인하고 시작
+                  예상 성과와 착수 일정을 실행 전에 확인
                 </h3>
-                <div className="mt-5 grid min-w-0 gap-3 sm:grid-cols-3">
-                  <div className="min-w-0 rounded-lg border border-zinc-100 bg-zinc-50/80 p-3">
-                    <p className="text-[11px] text-zinc-500">예상 도달</p>
-                    <p className="mt-1 text-sm font-semibold tabular-nums text-zinc-900">1.2M+</p>
+                <div className="mt-5 divide-y divide-zinc-200/80 rounded-lg border border-zinc-100 bg-zinc-50/80">
+                  <div className="flex items-center justify-between gap-3 px-3 py-2.5">
+                    <span className="shrink-0 text-[11px] text-zinc-500">예상 도달</span>
+                    <span className="text-right text-sm font-semibold tabular-nums text-zinc-900">1.2M+</span>
                   </div>
-                  <div className="min-w-0 rounded-lg border border-zinc-100 bg-zinc-50/80 p-3">
-                    <p className="text-[11px] text-zinc-500">운영 시작</p>
-                    <p className="mt-1 text-sm font-semibold tabular-nums leading-none text-zinc-900">24h</p>
-                    <p className="text-[11px] font-medium leading-none text-zinc-500">~</p>
-                    <p className="text-sm font-semibold tabular-nums leading-none text-zinc-900">72h</p>
-                    <p className="mt-1.5 text-[11px] text-zinc-500">착수 ETA</p>
+                  <div className="flex items-center justify-between gap-3 px-3 py-2.5">
+                    <span className="min-w-0 text-[11px] leading-snug text-zinc-500">
+                      운영 시작 <span className="text-zinc-400">·</span> 착수 ETA
+                    </span>
+                    <span className="shrink-0 text-sm font-semibold tabular-nums text-zinc-900 whitespace-nowrap">
+                      24h ~ 72h
+                    </span>
                   </div>
-                  <div className="min-w-0 rounded-lg border border-zinc-100 bg-zinc-50/80 p-3">
-                    <p className="text-[11px] text-zinc-500">리포트</p>
-                    <p className="mt-1 text-sm font-semibold tabular-nums text-zinc-900">D+7</p>
-                    <p className="mt-1.5 text-[11px] text-zinc-500">성과 요약</p>
+                  <div className="flex items-center justify-between gap-3 px-3 py-2.5">
+                    <span className="min-w-0 text-[11px] leading-snug text-zinc-500">
+                      리포트 <span className="text-zinc-400">·</span> 성과 요약
+                    </span>
+                    <span className="text-right text-sm font-semibold tabular-nums text-zinc-900">D+7</span>
                   </div>
                 </div>
               </div>
@@ -655,70 +644,6 @@ export default function ForBrandsPage() {
           ))}
         </section>
 
-        <section className="brand-section-tight mt-28 space-y-16 sm:space-y-24">
-          <article className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-2 lg:gap-10">
-            <div className="relative min-h-[260px] overflow-hidden rounded-xl border border-zinc-800 bg-linear-to-br from-zinc-950 via-zinc-900 to-zinc-950 px-7 py-8 text-left text-white">
-              <div className="pointer-events-none absolute -top-8 right-8 h-20 w-20 rounded-full bg-fuchsia-400/10 blur-2xl" />
-              <div className="pointer-events-none absolute -bottom-8 -left-6 h-24 w-24 rounded-full bg-sky-400/10 blur-2xl" />
-              <p className="text-xs font-semibold tracking-[0.14em] text-primary">SOLUTIONS</p>
-              <h2 className="mt-3 text-balance font-heading text-3xl font-semibold leading-[1.15] tracking-tight text-white sm:text-[2rem]">
-                운영팀이 쓰기 좋은 한 흐름
-              </h2>
-              <p className="max-w-[38ch] text-sm leading-relaxed text-zinc-300 sm:text-base">
-                <span className="block">인사이트·실행·리포트를 같은 화면 언어로 묶어</span>
-                <span className="block">내부 공유와 다음 액션을 빠르게 잡습니다</span>
-              </p>
-              <ul className="mt-6 space-y-4 pt-1 text-left text-sm leading-snug text-zinc-200">
-                <li className="flex gap-3">
-                  <span className="mt-2 inline-block size-1.5 shrink-0 rounded-full bg-fuchsia-300" />
-                  인사이트로 메시지·채널 방향을 잡습니다
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-2 inline-block size-1.5 shrink-0 rounded-full bg-fuchsia-300" />
-                  세팅 조건에 맞춰 섭외·일정을 한곳에서 봅니다
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-2 inline-block size-1.5 shrink-0 rounded-full bg-fuchsia-300" />
-                  업로드·지표를 묶어 다음 캠페인 결정을 돕습니다
-                </li>
-              </ul>
-              <Link
-                href="/services/visit-content"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "mt-5 w-fit border-white/40 bg-white/10 text-white hover:bg-white/15",
-                )}
-              >
-                {brandServiceOutlineLabel}
-              </Link>
-            </div>
-            <div className="relative min-h-[260px] w-full flex-1 overflow-hidden rounded-xl border border-zinc-800 bg-linear-to-br from-zinc-950 via-zinc-900 to-zinc-950 px-7 py-8 text-left text-white">
-              <div className="pointer-events-none absolute -top-8 right-8 h-20 w-20 rounded-full bg-fuchsia-400/10 blur-2xl" />
-              <div className="pointer-events-none absolute -bottom-8 -left-6 h-24 w-24 rounded-full bg-sky-400/10 blur-2xl" />
-              <p className="text-xs font-semibold tracking-wide text-zinc-300">캠페인 개요 예시</p>
-              <h3 className="mt-4 text-xl font-semibold tracking-tight sm:text-2xl">한 화면에서 전략부터 실행까지</h3>
-              <p className="mt-3 max-w-[34ch] text-sm leading-relaxed text-zinc-300">
-                <span className="block">도달·일정·진행을 한눈에</span>
-                <span className="block">보고용 근거를 빠르게 만듭니다</span>
-              </p>
-              <div className="mt-8 space-y-6 border-t border-white/10 pt-8">
-                <div>
-                  <p className="text-xs font-medium text-zinc-400">타겟 예시</p>
-                  <p className="mt-2 text-sm font-medium leading-snug text-white">
-                    K-Beauty 관심 20~34세 · 도심권 방문형 콘텐츠 반응이 높은 세그먼트
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-zinc-400">운영에서 보는 지표</p>
-                  <p className="mt-2 text-sm font-medium leading-snug text-white">
-                    예상 도달 대비 효율, 업로드 완료율, 캠페인 단계별 상태
-                  </p>
-                </div>
-              </div>
-            </div>
-          </article>
-        </section>
-
         <section className="brand-section-tight mt-32 sm:mt-40">
           <div className="mx-auto max-w-4xl px-2 text-center">
             <p className="text-xs font-semibold tracking-[0.22em] text-primary/90">CAMPAIGN FLOW</p>
@@ -726,7 +651,7 @@ export default function ForBrandsPage() {
               캠페인 프로세스
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-zinc-500">
-              네 단계로 끝까지 이어집니다. 일정·운영 세부는 전용 페이지에서 확인하세요.
+              4단계로 이어지는 명확한 워크플로우. 자세한 내용은 서비스 설명을 참조해주세요.
             </p>
           </div>
 
@@ -745,7 +670,7 @@ export default function ForBrandsPage() {
                   </div>
                   <p className="mt-5 text-[10px] font-bold tracking-[0.2em] text-primary/85">STEP {index + 1}</p>
                   <p className="mt-1.5 font-heading text-base font-semibold tracking-tight text-zinc-900">{item.title}</p>
-                  <p className="mt-2 max-w-46 text-pretty text-xs leading-snug text-zinc-500 sm:max-w-52 sm:text-[0.8125rem]">
+                  <p className="mt-2 max-w-46 whitespace-pre-line text-pretty text-xs leading-snug text-zinc-500 sm:max-w-52 sm:text-[0.8125rem]">
                     {item.body}
                   </p>
                 </li>
@@ -767,7 +692,7 @@ export default function ForBrandsPage() {
                   <div className="min-w-0 pt-0.5">
                     <p className="text-[10px] font-bold tracking-[0.18em] text-primary/85">STEP {index + 1}</p>
                     <p className="mt-1 font-heading text-lg font-semibold tracking-tight text-zinc-900">{item.title}</p>
-                    <p className="mt-1.5 text-sm leading-snug text-zinc-500">{item.body}</p>
+                    <p className="mt-1.5 whitespace-pre-line text-sm leading-snug text-zinc-500">{item.body}</p>
                   </div>
                 </li>
               ))}
@@ -793,100 +718,12 @@ export default function ForBrandsPage() {
             >
               {brandServiceOutlineLabel}
             </Link>
-            <Link
-              href="/for-brands/process"
-              className="text-center text-sm font-medium text-zinc-500 underline-offset-4 hover:text-zinc-800 hover:underline"
-            >
-              6단계·운영 상세 보기
-            </Link>
           </div>
         </section>
 
-        <section className="mx-auto mt-28 w-full max-w-6xl px-1 sm:px-0">
-          <div className="w-full text-center">
-            <h2 className="font-heading text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">요금 안내</h2>
-            <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-zinc-600">
-              팔로워 5천 이하·이상 인원을 섞어 합산할 수 있습니다. 세부 견적은 캠페인 세팅에서 동일 기준으로 확인할 수 있어요.
-            </p>
-          </div>
-
-          <div className="relative mt-10 w-full overflow-hidden rounded-2xl border border-zinc-200/80 bg-zinc-50/30 px-6 py-12 sm:px-10 sm:py-14">
-            <div
-              className="pointer-events-none absolute -left-10 top-0 h-32 w-32 rounded-full bg-fuchsia-400/8 blur-2xl"
-              aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute -right-8 bottom-0 h-28 w-28 rounded-full bg-rose-300/10 blur-2xl"
-              aria-hidden
-            />
-
-            <div className="relative grid gap-8 md:grid-cols-2 md:items-stretch lg:gap-10">
-              <div className="relative flex flex-col overflow-hidden rounded-xl border-2 border-primary/35 bg-white p-7 shadow-[0_22px_50px_-34px_rgba(236,72,153,0.72)] sm:p-8">
-                <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-fuchsia-300/25 blur-2xl" aria-hidden />
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] leading-normal text-fuchsia-600/90">Standard</p>
-                <h3 className="mt-3 font-heading text-lg font-semibold leading-snug text-zinc-900">팔로워 5천 이하</h3>
-                <p className="mt-6 font-heading text-3xl font-black tabular-nums tracking-tight text-fuchsia-700 sm:text-4xl">
-                  250,000
-                  <span className="ml-1.5 text-base font-semibold text-fuchsia-600/85">원</span>
-                </p>
-                <p className="mt-4 text-sm font-semibold leading-relaxed text-fuchsia-700">1인 기준 · 25만원</p>
-                <ul className="mt-8 space-y-3.5 text-sm leading-relaxed text-zinc-700">
-                  <li className="flex gap-2.5">
-                    <span className="shrink-0 font-bold text-fuchsia-600">✓</span>
-                    거주 국가 추가금 없음
-                  </li>
-                  <li className="flex gap-2.5">
-                    <span className="shrink-0 font-bold text-fuchsia-600">✓</span>
-                    방문 1회 · 콘텐츠 1업로드 체계
-                  </li>
-                </ul>
-              </div>
-
-              <div className="relative flex flex-col rounded-xl border border-zinc-200/90 bg-white p-7 sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] leading-normal text-fuchsia-700">Plus</p>
-                <h3 className="mt-3 font-heading text-lg font-semibold leading-snug text-zinc-900">팔로워 5천 이상</h3>
-                <p className="mt-6 font-heading text-2xl font-bold tabular-nums tracking-tight text-zinc-900 sm:text-3xl">
-                  500,000
-                  <span className="ml-1.5 text-base font-semibold text-zinc-500">원</span>
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-zinc-600">
-                  1인 기준 (50만원)
-                </p>
-                <ul className="mt-8 space-y-3.5 text-sm leading-relaxed text-zinc-700">
-                  <li className="flex gap-2.5">
-                    <span className="shrink-0 text-zinc-500">·</span>
-                    5천 이상 구간은 고정 단가로 동일 적용
-                  </li>
-                  <li className="flex gap-2.5">
-                    <span className="shrink-0 text-zinc-500">·</span>
-                    세부 조건은 상담 시 별도 합의 가능
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <p className="relative mx-auto mt-8 max-w-2xl text-center text-xs leading-relaxed text-zinc-500">
-              위 단가 외 조정이 필요한 경우 별도 합의 후 반영됩니다.
-            </p>
-          </div>
-        </section>
-
-        <section className="mx-auto mt-20 w-full max-w-6xl space-y-5">
-          <BrandBudgetCalculator />
-          <p className="mx-auto max-w-2xl text-center text-[11px] leading-relaxed text-zinc-500 sm:text-xs">
-            결제는 <span className="text-zinc-600">무통장입금</span>만 가능하며 PG 연동 없이 입금 확인 후 진행됩니다. 브랜드 전용 기능은 회원가입 후 이용할 수 있고, 로그인 아이디는
-            컨택 이메일을 사용합니다.{" "}
-            <Link href="/signup" className="font-medium text-primary underline-offset-2 hover:underline">
-              회원가입
-            </Link>
-          </p>
-        </section>
+        <BrandPricingGuide />
 
         <BrandWhyKlinkCta />
-
-        <div className="mt-16 border-t border-border/50 pt-8 text-center text-xs text-muted-foreground">
-          <p>문의 및 제휴는 로그인 후 내부 채널 또는 별도 안내에 따릅니다.</p>
-          <p className="mt-2">크리에이터 대상 글로벌 안내는 다국어 페이지에서 확인할 수 있습니다.</p>
-        </div>
       </main>
 
       <BrandFloatingSetupCta label={brandPrimaryCtaLabel} />

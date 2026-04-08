@@ -17,6 +17,7 @@ const coverageRegions = [
   { iso: "eu", label: "EU" },
   { iso: "ae", label: "AE" },
   { iso: "sg", label: "SG" },
+  { iso: "mx", label: "MX" },
 ] as const;
 
 /**
@@ -85,7 +86,8 @@ export function BrandImpactHero({ fullScreen = false }: { fullScreen?: boolean }
   const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 
   const heroProgress = fullScreen ? clamp01(scrollY / phaseLine1) : 1;
-  const headlineSecondProgress = fullScreen ? clamp01((scrollY - t1) / phaseLine2) : 1;
+  /** 첫 두 헤드라인(「전 세계 어디든」「인플루언서를 보내드립니다」)은 진입 즉시 동시 노출. 이후 스크롤 단계는 서브카피·권역만 기존 로직 유지 */
+  const headlineSecondProgress = 1;
   const subCopyProgress = fullScreen ? clamp01((scrollY - t2) / phaseSubCopy) : 1;
   /** 운영 권역 타원 + 국기 — 완료 후 이어지는 스크롤로 핀 해제·다음 섹션 */
   const ovalProgress = fullScreen ? clamp01((scrollY - t3) / phaseOvals) : 1;

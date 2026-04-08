@@ -108,7 +108,7 @@ export function CampaignProcessDetailDashboard({ steps }: { steps: readonly Proc
         </span>
       </div>
 
-      <div className="relative hidden h-[4.25rem] overflow-hidden border-b border-zinc-800/80 bg-linear-to-r from-zinc-950 via-fuchsia-950/90 to-zinc-950 sm:block" aria-hidden>
+      <div className="relative hidden h-17 overflow-hidden border-b border-zinc-800/80 bg-linear-to-r from-zinc-950 via-fuchsia-950/90 to-zinc-950 sm:block" aria-hidden>
         <p className="absolute left-4 top-2 z-10 text-[9px] font-semibold uppercase tracking-[0.2em] text-fuchsia-300/90">
           Matching flow visual
         </p>

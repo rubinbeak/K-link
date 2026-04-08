@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { ConsultingForm } from "@/app/consulting/consulting-form";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { userToBrandContactStep1 } from "@/lib/brand-profile";
 
 export default async function ConsultingPage() {
   const session = await auth();
@@ -10,6 +12,26 @@ export default async function ConsultingPage() {
   if (session.user.role !== "BRAND") {
     redirect("/auth/redirect");
   }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { brandName: true, name: true, email: true, brandContactEmail: true, contactPhoneE164: true },
+  });
+  const profile = userToBrandContactStep1(
+    user ?? {
+      brandName: null,
+      name: null,
+      email: session.user.email ?? "",
+      brandContactEmail: null,
+      contactPhoneE164: null,
+    },
+  );
+  const defaultContact = {
+    brandName: profile.contactBrandName,
+    managerProfile: profile.contactManagerProfile,
+    email: profile.contactEmail,
+    phone: profile.contactPhone,
+  };
 
   return (
     <div className="relative min-h-dvh overflow-hidden">
@@ -28,7 +50,7 @@ export default async function ConsultingPage() {
         </section>
 
         <section className="mx-auto mt-14 max-w-6xl">
-          <ConsultingForm />
+          <ConsultingForm defaultContact={defaultContact} />
         </section>
       </main>
     </div>

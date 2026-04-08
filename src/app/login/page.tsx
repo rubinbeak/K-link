@@ -3,6 +3,13 @@ import { auth } from "@/auth";
 import { LoginForm } from "./login-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
+/** 상대 경로만 허용(오픈 리다이렉트 방지). 없으면 마이페이지. */
+function safeInternalCallbackUrl(raw: string | undefined): string {
+  if (!raw || typeof raw !== "string") return "/my";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/my";
+  return raw;
+}
+
 function getLoginErrorMessage(error: string | undefined) {
   switch (error) {
     case "AccessDenied":
@@ -25,14 +32,14 @@ export default async function LoginPage({
 }: {
   searchParams?: Promise<{ callbackUrl?: string; intent?: string; error?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
+  const callbackUrl = safeInternalCallbackUrl(resolvedSearchParams?.callbackUrl);
+
   const session = await auth();
   if (session?.user) {
-    redirect("/my");
+    redirect(callbackUrl);
   }
 
-  const resolvedSearchParams = await searchParams;
-  const rawCallbackUrl = resolvedSearchParams?.callbackUrl ?? "";
-  const callbackUrl = rawCallbackUrl.startsWith("/") ? rawCallbackUrl : "/auth/redirect";
   const intent = resolvedSearchParams?.intent === "signup" ? "signup" : "login";
   const errorMessage = getLoginErrorMessage(resolvedSearchParams?.error);
   const googleEnabled = Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET);
@@ -45,9 +52,9 @@ export default async function LoginPage({
       </div>
       <div className="relative mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4 py-12">
         <Card className="rounded-3xl border-border/70 bg-card/85 shadow-2xl shadow-pink-100/45 backdrop-blur-md">
-          <CardHeader className="space-y-2 text-center sm:text-left">
+          <CardHeader className="space-y-2 text-center justify-items-center">
             <CardTitle className="font-heading text-2xl tracking-tight">{intent === "signup" ? "브랜드 회원가입" : "브랜드 로그인"}</CardTitle>
-            <CardDescription>Google 계정으로 바로 회원가입 및 로그인할 수 있습니다.</CardDescription>
+            <CardDescription className="text-pretty">Google 계정으로 바로 회원가입 및 로그인할 수 있습니다.</CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm callbackUrl={callbackUrl} intent={intent} googleEnabled={googleEnabled} initialError={errorMessage} />

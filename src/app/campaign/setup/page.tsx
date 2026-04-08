@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { CampaignSetupFunnelForm } from "@/components/campaign/campaign-setup-funnel-form";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { userToBrandContactStep1 } from "@/lib/brand-profile";
 
 export default async function CampaignSetupPage() {
   const session = await auth();
@@ -11,5 +13,19 @@ export default async function CampaignSetupPage() {
     redirect("/auth/redirect");
   }
 
-  return <CampaignSetupFunnelForm />;
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { brandName: true, name: true, email: true, brandContactEmail: true, contactPhoneE164: true },
+  });
+  const initialBrandProfile = userToBrandContactStep1(
+    user ?? {
+      brandName: null,
+      name: null,
+      email: session.user.email ?? "",
+      brandContactEmail: null,
+      contactPhoneE164: null,
+    },
+  );
+
+  return <CampaignSetupFunnelForm initialBrandProfile={initialBrandProfile} />;
 }

@@ -46,7 +46,16 @@ function toggleMultiValue(values: string[], target: string) {
   return values.includes(target) ? values.filter((item) => item !== target) : [...values, target]
 }
 
-export function ConsultingForm() {
+export function ConsultingForm({
+  defaultContact,
+}: {
+  defaultContact?: {
+    brandName: string;
+    managerProfile: string;
+    email: string;
+    phone: string;
+  };
+} = {}) {
   const [campaignTypes, setCampaignTypes] = useState<string[]>([])
   const [goals, setGoals] = useState<string[]>([])
   const [influencerScale, setInfluencerScale] = useState<string>("")
@@ -181,19 +190,49 @@ export function ConsultingForm() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="brandName" className="text-[13px] tracking-tight text-zinc-700">회사 / 브랜드명 *</Label>
-            <Input id="brandName" name="brandName" required placeholder="예: K-LINK Beauty" className="h-10" />
+            <Input
+              id="brandName"
+              name="brandName"
+              required
+              placeholder="예: K-LINK Beauty"
+              className="h-10"
+              defaultValue={defaultContact?.brandName ?? ""}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="managerProfile" className="text-[13px] tracking-tight text-zinc-700">직함, 담당자 이름 *</Label>
-            <Input id="managerProfile" name="managerProfile" required placeholder="예: 마케팅 매니저 김민지" className="h-10" />
+            <Input
+              id="managerProfile"
+              name="managerProfile"
+              required
+              placeholder="예: 마케팅 매니저 김민지"
+              className="h-10"
+              defaultValue={defaultContact?.managerProfile ?? ""}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-[13px] tracking-tight text-zinc-700">이메일 *</Label>
-            <Input id="email" name="email" type="email" required placeholder="you@brand.com" className="h-10" />
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              required
+              placeholder="you@brand.com"
+              className="h-10"
+              defaultValue={defaultContact?.email ?? ""}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone" className="text-[13px] tracking-tight text-zinc-700">연락처 *</Label>
-            <Input id="phone" name="phone" type="tel" required placeholder="예: 010-1234-5678" className="h-10" />
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              required
+              placeholder="예: 010-1234-5678"
+              className="h-10"
+              defaultValue={defaultContact?.phone ?? ""}
+            />
           </div>
         </div>
       </section>

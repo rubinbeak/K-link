@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { benefitLabel, BENEFIT_VALUES, platformLabel, PLATFORM_VALUES, regionLabel, REGION_VALUES } from "@/lib/visit-campaign";
 import { useCampaignFormAutosave } from "@/components/campaign/use-campaign-form-autosave";
 import { isFunnelDraftData, type FunnelDraftPayload } from "@/lib/funnel-campaign-finalize";
+import { mergeBrandProfileIntoStep1, type BrandContactStep1 } from "@/lib/brand-profile";
 
 const PLACE_OPTIONS = [
   { value: "BEAUTY_STORE", label: "뷰티 매장" },
@@ -164,19 +165,26 @@ export function CampaignSetupFunnelForm({
   initialDraftId,
   initialDraftData,
   initialStep,
+  initialBrandProfile,
 }: {
   initialDraftId?: string;
   initialDraftData?: unknown;
   initialStep?: number;
+  initialBrandProfile?: BrandContactStep1;
 } = {}) {
   const router = useRouter();
   const [step, setStep] = useState(() =>
     initialStep !== undefined && initialStep >= 1 && initialStep <= 3 ? initialStep : 1,
   );
   const [draftId, setDraftId] = useState(initialDraftId ?? "");
-  const [formData, setFormData] = useState<CampaignSetupFormData>(() =>
-    mergeServerDraftIntoForm(defaultData, initialDraftData),
-  );
+  const [formData, setFormData] = useState<CampaignSetupFormData>(() => {
+    const fromDraft = mergeServerDraftIntoForm(defaultData, initialDraftData);
+    if (!initialBrandProfile) return fromDraft;
+    return {
+      ...fromDraft,
+      step1: mergeBrandProfileIntoStep1(fromDraft.step1, initialBrandProfile),
+    };
+  });
   const [savingServer, setSavingServer] = useState(false);
   const [savedAtServer, setSavedAtServer] = useState("");
   const [serverError, setServerError] = useState("");

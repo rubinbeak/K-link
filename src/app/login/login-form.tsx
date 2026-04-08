@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 export function LoginForm({
-  callbackUrl = "/auth/redirect",
+  callbackUrl = "/my",
   intent = "login",
   googleEnabled = true,
   initialError = null,
@@ -20,7 +20,7 @@ export function LoginForm({
   const ctaLabel = intent === "signup" ? "Google로 회원가입" : "Google로 로그인";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-center">
       <Button
         type="button"
         className="w-full"
@@ -40,7 +40,7 @@ export function LoginForm({
           Google 로그인이 아직 활성화되지 않았습니다. `AUTH_GOOGLE_ID`와 `AUTH_GOOGLE_SECRET` 환경 변수를 먼저 설정해 주세요.
         </p>
       ) : null}
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive text-center">{error}</p> : null}
     </div>
   );
 }

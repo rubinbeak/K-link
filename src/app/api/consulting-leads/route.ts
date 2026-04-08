@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/api-auth";
+import { persistBrandContactForUser } from "@/lib/brand-profile";
 
 const bodySchema = z.object({
   brandName: z.string().min(1),
@@ -53,6 +54,13 @@ export async function POST(request: Request) {
       message,
       status: "RECEIVED",
     },
+  });
+
+  await persistBrandContactForUser(prisma, authResult.session.user.id, {
+    contactBrandName: p.brandName,
+    contactManagerProfile: p.managerProfile,
+    contactEmail: p.email,
+    contactPhone: p.phone?.trim() ?? "",
   });
 
   return NextResponse.json({ ok: true });

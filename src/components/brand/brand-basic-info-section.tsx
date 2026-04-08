@@ -1,0 +1,118 @@
+"use client";
+
+import { useState } from "react";
+import { Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import type { BrandContactStep1 } from "@/lib/brand-profile";
+
+const sectionCard = "rounded-xl border border-zinc-200/85 bg-white/85 p-4 sm:p-5";
+
+export function BrandBasicInfoSection({
+  initialProfile,
+  className,
+}: {
+  initialProfile: BrandContactStep1;
+  className?: string;
+}) {
+  const [profile, setProfile] = useState<BrandContactStep1>(initialProfile);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  async function onSave() {
+    setSaving(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/brand/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contactBrandName: profile.contactBrandName,
+          contactManagerProfile: profile.contactManagerProfile,
+          contactEmail: profile.contactEmail,
+          contactPhone: profile.contactPhone,
+        }),
+      });
+      const data = (await res.json()) as { profile?: BrandContactStep1; error?: unknown };
+      if (!res.ok) {
+        setMessage({ type: "err", text: "저장에 실패했습니다. 입력값을 확인해 주세요." });
+        return;
+      }
+      if (data.profile) setProfile(data.profile);
+      setMessage({ type: "ok", text: "저장되었습니다. 캠페인 세팅·상담 화면에도 동일하게 반영됩니다." });
+    } catch {
+      setMessage({ type: "err", text: "네트워크 오류로 저장하지 못했습니다." });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className={cn("rounded-2xl border border-zinc-200/80 bg-white/90 shadow-sm", className)}>
+      <div className={sectionCard}>
+        <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-primary">
+          <Sparkles className="size-3.5" aria-hidden />
+          1. 기본 정보
+        </p>
+        <h2 className="mb-4 text-lg font-semibold tracking-tight text-zinc-900">담당자 정보를 알려주세요</h2>
+        <p className="mb-4 text-sm text-zinc-600">
+          아래 정보는 캠페인 세팅·상담 신청 시 자동으로 불러오며, 한 곳에서 수정하면 모두 동일하게 적용됩니다.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="mypage-brandName">회사 / 브랜드명 *</Label>
+            <Input
+              id="mypage-brandName"
+              value={profile.contactBrandName}
+              onChange={(e) => setProfile((p) => ({ ...p, contactBrandName: e.target.value }))}
+              placeholder="예: K-LINK Beauty"
+              autoComplete="organization"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="mypage-manager">직함, 담당자 이름 *</Label>
+            <Input
+              id="mypage-manager"
+              value={profile.contactManagerProfile}
+              onChange={(e) => setProfile((p) => ({ ...p, contactManagerProfile: e.target.value }))}
+              placeholder="예: 마케팅 매니저 김민지"
+              autoComplete="name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="mypage-email">이메일 *</Label>
+            <Input
+              id="mypage-email"
+              type="email"
+              value={profile.contactEmail}
+              onChange={(e) => setProfile((p) => ({ ...p, contactEmail: e.target.value }))}
+              placeholder="you@brand.com"
+              autoComplete="email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="mypage-phone">연락처 *</Label>
+            <Input
+              id="mypage-phone"
+              type="tel"
+              value={profile.contactPhone}
+              onChange={(e) => setProfile((p) => ({ ...p, contactPhone: e.target.value }))}
+              placeholder="예: 010-1234-5678"
+              autoComplete="tel"
+            />
+          </div>
+        </div>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <Button type="button" onClick={() => void onSave()} disabled={saving}>
+            {saving ? "저장 중..." : "기본 정보 저장"}
+          </Button>
+          {message ? (
+            <p className={cn("text-sm", message.type === "ok" ? "text-emerald-700" : "text-destructive")}>{message.text}</p>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}

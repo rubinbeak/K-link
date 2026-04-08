@@ -22,7 +22,7 @@ export function ApplicantActionButtons({
         disabled={pending || done}
         onClick={() => start(() => selectApplicant(applicationId))}
       >
-        Select
+        선정
       </Button>
       <Button
         type="button"
@@ -31,7 +31,7 @@ export function ApplicantActionButtons({
         disabled={pending || done}
         onClick={() => start(() => rejectApplicant(applicationId))}
       >
-        Reject
+        반려
       </Button>
     </div>
   );

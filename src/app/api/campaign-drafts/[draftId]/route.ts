@@ -3,6 +3,7 @@ import type { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/api-auth";
 import { campaignDraftUpsertSchema } from "@/lib/visit-campaign";
+import { funnelStep1ToBrandContact, persistBrandContactForUser } from "@/lib/brand-profile";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ draftId: string }> }) {
   const authResult = await requireRole("BRAND");
@@ -58,6 +59,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ dr
       lastSavedAt: new Date(),
     },
   });
+
+  const mergedObj = merged as Record<string, unknown>;
+  const contact = mergedObj.step1 ? funnelStep1ToBrandContact(mergedObj.step1) : null;
+  if (contact) {
+    await persistBrandContactForUser(prisma, authResult.session.user.id, contact);
+  }
 
   return NextResponse.json({
     draftId: draft.id,

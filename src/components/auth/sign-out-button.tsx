@@ -12,7 +12,7 @@ export function SignOutButton({ className }: { className?: string }) {
       className={className}
       onClick={() => signOut({ callbackUrl: "/" })}
     >
-      Sign out
+      로그아웃
     </Button>
   );
 }

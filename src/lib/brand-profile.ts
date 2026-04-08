@@ -7,36 +7,36 @@ export type BrandContactStep1 = {
   contactPhone: string;
 };
 
-export function userToBrandContactStep1(user: Pick<User, "brandName" | "name" | "email" | "brandContactEmail" | "contactPhoneE164">): BrandContactStep1 {
+export function userToBrandContactStep1(user: Pick<User, "brandName" | "name" | "email" | "contactPhoneE164">): BrandContactStep1 {
   return {
     contactBrandName: user.brandName ?? "",
     contactManagerProfile: user.name ?? "",
-    contactEmail: user.brandContactEmail ?? user.email ?? "",
+    contactEmail: user.email ?? "",
     contactPhone: user.contactPhoneE164 ?? "",
   };
 }
 
 export function hasAnyBrandContactInput(s: BrandContactStep1): boolean {
   return Boolean(
-    s.contactBrandName.trim() || s.contactManagerProfile.trim() || s.contactEmail.trim() || s.contactPhone.trim(),
+    s.contactBrandName.trim() || s.contactManagerProfile.trim() || s.contactPhone.trim() || s.contactEmail.trim(),
   );
 }
 
-/** User 테이블에 브랜드 담당자 정보 반영(빈 문자열은 null로 저장) */
+/** User 테이블에 브랜드 담당자 정보 반영(이메일은 로그인 계정 `email` 사용, 여기서는 저장하지 않음) */
 export function brandContactToUserUpdateData(s: BrandContactStep1) {
   return {
     brandName: s.contactBrandName.trim() || null,
     name: s.contactManagerProfile.trim() || null,
-    brandContactEmail: s.contactEmail.trim() || null,
     contactPhoneE164: s.contactPhone.trim() || null,
   };
 }
 
 export async function persistBrandContactForUser(prisma: PrismaClient, userId: string, step1: BrandContactStep1) {
-  if (!hasAnyBrandContactInput(step1)) return;
+  const data = brandContactToUserUpdateData(step1);
+  if (data.brandName === null && data.name === null && data.contactPhoneE164 === null) return;
   await prisma.user.update({
     where: { id: userId },
-    data: brandContactToUserUpdateData(step1),
+    data,
   });
 }
 
@@ -50,7 +50,8 @@ export function funnelStep1ToBrandContact(step1: unknown): BrandContactStep1 | n
     contactEmail: typeof s.contactEmail === "string" ? s.contactEmail : "",
     contactPhone: typeof s.contactPhone === "string" ? s.contactPhone : "",
   };
-  return hasAnyBrandContactInput(out) ? out : null;
+  if (!hasAnyBrandContactInput(out)) return null;
+  return out;
 }
 
 /** 초안/폼에 값이 비어 있으면 마이페이지에 저장된 프로필로 채움 */

@@ -2,12 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/api-auth";
-import { brandContactToUserUpdateData, hasAnyBrandContactInput, userToBrandContactStep1 } from "@/lib/brand-profile";
+import { brandContactToUserUpdateData, userToBrandContactStep1 } from "@/lib/brand-profile";
 
 const patchSchema = z.object({
   contactBrandName: z.string(),
   contactManagerProfile: z.string(),
-  contactEmail: z.string().email(),
   contactPhone: z.string(),
 });
 
@@ -17,7 +16,7 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: authResult.session.user.id },
-    select: { brandName: true, name: true, email: true, brandContactEmail: true, contactPhoneE164: true },
+    select: { brandName: true, name: true, email: true, contactPhoneE164: true },
   });
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -34,15 +33,28 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
+  const userRow = await prisma.user.findUnique({
+    where: { id: authResult.session.user.id },
+    select: { email: true },
+  });
+  if (!userRow?.email) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
   const step1 = {
     contactBrandName: parsed.data.contactBrandName,
     contactManagerProfile: parsed.data.contactManagerProfile,
-    contactEmail: parsed.data.contactEmail,
+    contactEmail: userRow.email,
     contactPhone: parsed.data.contactPhone,
   };
 
-  if (!hasAnyBrandContactInput(step1)) {
-    return NextResponse.json({ error: "최소 한 항목 이상 입력해 주세요." }, { status: 400 });
+  if (
+    !parsed.data.contactBrandName.trim() &&
+    !parsed.data.contactManagerProfile.trim() &&
+    !parsed.data.contactPhone.trim()
+  ) {
+    return NextResponse.json(
+      { error: "회사/브랜드명, 담당자, 연락처 중 최소 한 항목은 입력해 주세요." },
+      { status: 400 },
+    );
   }
 
   await prisma.user.update({
@@ -52,7 +64,7 @@ export async function PATCH(request: Request) {
 
   const user = await prisma.user.findUnique({
     where: { id: authResult.session.user.id },
-    select: { brandName: true, name: true, email: true, brandContactEmail: true, contactPhoneE164: true },
+    select: { brandName: true, name: true, email: true, contactPhoneE164: true },
   });
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 

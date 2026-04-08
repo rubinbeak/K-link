@@ -15,14 +15,13 @@ export default async function CampaignSetupPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { brandName: true, name: true, email: true, brandContactEmail: true, contactPhoneE164: true },
+    select: { brandName: true, name: true, email: true, contactPhoneE164: true },
   });
   const initialBrandProfile = userToBrandContactStep1(
     user ?? {
       brandName: null,
       name: null,
       email: session.user.email ?? "",
-      brandContactEmail: null,
       contactPhoneE164: null,
     },
   );

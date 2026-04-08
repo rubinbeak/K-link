@@ -20,7 +20,7 @@ export default async function BrandDashboardPage() {
   const [user, campaigns] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { brandName: true, name: true, email: true, brandContactEmail: true, contactPhoneE164: true },
+      select: { brandName: true, name: true, email: true, contactPhoneE164: true },
     }),
     prisma.campaign.findMany({
       where: { brandId: session.user.id },
@@ -43,7 +43,6 @@ export default async function BrandDashboardPage() {
       brandName: null,
       name: null,
       email: session.user.email ?? "",
-      brandContactEmail: null,
       contactPhoneE164: null,
     },
   );

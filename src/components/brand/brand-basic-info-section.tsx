@@ -31,7 +31,6 @@ export function BrandBasicInfoSection({
         body: JSON.stringify({
           contactBrandName: profile.contactBrandName,
           contactManagerProfile: profile.contactManagerProfile,
-          contactEmail: profile.contactEmail,
           contactPhone: profile.contactPhone,
         }),
       });
@@ -82,15 +81,18 @@ export function BrandBasicInfoSection({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="mypage-email">이메일 *</Label>
+            <Label htmlFor="mypage-email">이메일 (로그인 계정)</Label>
             <Input
               id="mypage-email"
               type="email"
+              readOnly
+              tabIndex={-1}
               value={profile.contactEmail}
-              onChange={(e) => setProfile((p) => ({ ...p, contactEmail: e.target.value }))}
+              className="cursor-not-allowed bg-muted/40"
               placeholder="you@brand.com"
               autoComplete="email"
             />
+            <p className="text-xs text-muted-foreground">Google 로그인에 사용 중인 이메일입니다.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="mypage-phone">연락처 *</Label>

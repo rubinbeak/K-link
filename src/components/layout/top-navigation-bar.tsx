@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -75,8 +76,18 @@ export function TopNavigationBar() {
       )}
     >
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-        <Link href="/for-brands" className="shrink-0 text-base font-semibold tracking-tight sm:text-lg">
-          <span className="text-primary">K-LINK</span>
+        <Link
+          href="/for-brands"
+          className="relative flex h-10 shrink-0 items-center py-0.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
+        >
+          <Image
+            src="/images/k-link-logo.png"
+            alt="K-LINK Logo"
+            width={64}
+            height={64}
+            className="h-9 w-auto object-contain object-left sm:h-10"
+            priority
+          />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="메인 퍼널 메뉴">

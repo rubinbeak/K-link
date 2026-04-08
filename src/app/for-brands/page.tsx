@@ -883,10 +883,10 @@ export default function ForBrandsPage() {
 
         <BrandWhyKlinkCta />
 
-        <footer className="mt-16 border-t border-border/50 pt-8 text-center text-xs text-muted-foreground">
-          <p>© K-LINK. 문의 및 제휴는 로그인 후 내부 채널 또는 별도 안내에 따릅니다.</p>
+        <div className="mt-16 border-t border-border/50 pt-8 text-center text-xs text-muted-foreground">
+          <p>문의 및 제휴는 로그인 후 내부 채널 또는 별도 안내에 따릅니다.</p>
           <p className="mt-2">크리에이터 대상 글로벌 안내는 다국어 페이지에서 확인할 수 있습니다.</p>
-        </footer>
+        </div>
       </main>
 
       <BrandFloatingSetupCta label={brandPrimaryCtaLabel} />

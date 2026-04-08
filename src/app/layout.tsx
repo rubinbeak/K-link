@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Noto_Sans_KR, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { TopNavigationBar } from "@/components/layout/top-navigation-bar";
 
 const dmSans = DM_Sans({
@@ -40,11 +41,12 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${dmSans.variable} ${notoKr.variable} ${geistMono.variable} min-h-dvh overflow-x-hidden antialiased`}
+        className={`${dmSans.variable} ${notoKr.variable} ${geistMono.variable} flex min-h-dvh flex-col overflow-x-hidden antialiased`}
       >
         <AuthSessionProvider>
           <TopNavigationBar />
-          {children}
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
         </AuthSessionProvider>
       </body>
     </html>

@@ -2,7 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { CampaignSetupFunnelForm } from "@/components/campaign/campaign-setup-funnel-form";
 import { CampaignSetupWizard, type CampaignDraftData } from "@/components/campaign/campaign-setup-wizard";
+import { isFunnelDraftData } from "@/lib/funnel-campaign-finalize";
 
 export default async function CampaignSetupEditPage({ params }: { params: Promise<{ draftId: string }> }) {
   const { draftId } = await params;
@@ -12,6 +14,8 @@ export default async function CampaignSetupEditPage({ params }: { params: Promis
 
   const draft = await prisma.campaignDraft.findUnique({ where: { id: draftId } });
   if (!draft || draft.brandId !== session.user.id) redirect("/campaign/setup");
+
+  const useFunnel = isFunnelDraftData(draft.data);
 
   return (
     <div className="relative min-h-dvh overflow-hidden">
@@ -23,7 +27,11 @@ export default async function CampaignSetupEditPage({ params }: { params: Promis
         <Link href="/for-brands" className="mb-6 inline-block text-sm text-muted-foreground hover:text-foreground">
           ← 브랜드 페이지
         </Link>
-        <CampaignSetupWizard initialDraftId={draft.id} initialData={draft.data as Partial<CampaignDraftData>} />
+        {useFunnel ? (
+          <CampaignSetupFunnelForm initialDraftId={draft.id} initialDraftData={draft.data} initialStep={draft.currentStep} />
+        ) : (
+          <CampaignSetupWizard initialDraftId={draft.id} initialData={draft.data as Partial<CampaignDraftData>} />
+        )}
       </main>
     </div>
   );

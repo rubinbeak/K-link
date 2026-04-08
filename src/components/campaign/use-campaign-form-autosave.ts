@@ -13,10 +13,13 @@ export function useCampaignFormAutosave<T>({
   storageKey,
   data,
   onRestore,
+  skipRestore = false,
 }: {
   storageKey: string;
   data: T;
   onRestore: (restored: Partial<T>) => void;
+  /** 서버에서 불러온 초안이 있을 때 로컬 복원으로 덮어쓰지 않음 */
+  skipRestore?: boolean;
 }) {
   const [lastSavedAt, setLastSavedAt] = useState<string>("");
   const [toastMessage, setToastMessage] = useState("");
@@ -41,7 +44,10 @@ export function useCampaignFormAutosave<T>({
   );
 
   useEffect(() => {
-    if (restoredRef.current) return;
+    if (restoredRef.current || skipRestore) {
+      restoredRef.current = true;
+      return;
+    }
     restoredRef.current = true;
 
     try {
@@ -55,7 +61,7 @@ export function useCampaignFormAutosave<T>({
     } catch {
       // ignore restore parse errors
     }
-  }, [onRestore, storageKey]);
+  }, [onRestore, storageKey, skipRestore]);
 
   useEffect(() => {
     const id = setInterval(() => {

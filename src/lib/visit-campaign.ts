@@ -179,3 +179,10 @@ export const draftPayloadSchema = z.object({
 });
 
 export type DraftPayload = z.infer<typeof draftPayloadSchema>;
+
+/** 캠페인 초안 PATCH/POST — 퍼널 폼 등 임의 JSON을 `CampaignDraft.data`에 저장 */
+export const campaignDraftUpsertSchema = z.object({
+  name: z.string().optional(),
+  currentStep: z.number().int().min(1).max(3).optional(),
+  data: z.record(z.string(), z.unknown()).optional(),
+});

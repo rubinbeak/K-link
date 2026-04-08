@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/api-auth";
 import { calculateSchedule, estimatePricing } from "@/lib/visit-campaign";
 import { toInvoiceNumber } from "@/lib/invoice";
+import {
+  finalizeFunnelDraftTransaction,
+  isFunnelDraftData,
+  type FunnelDraftPayload,
+} from "@/lib/funnel-campaign-finalize";
 
 type DraftData = {
   step1?: {
@@ -43,6 +48,40 @@ export async function POST(_request: Request, { params }: { params: Promise<{ dr
   }
   if (draft.isFinalized) {
     return NextResponse.json({ error: "Already finalized" }, { status: 409 });
+  }
+
+  const rawData = draft.data as Record<string, unknown> | null;
+  if (isFunnelDraftData(draft.data)) {
+    const funnel: FunnelDraftPayload =
+      rawData?.formKind === "funnel"
+        ? (draft.data as FunnelDraftPayload)
+        : ({
+            formKind: "funnel",
+            step1: rawData?.step1,
+            step2: rawData?.step2,
+            step3: rawData?.step3,
+          } as FunnelDraftPayload);
+
+    try {
+      const result = await prisma.$transaction((tx) =>
+        finalizeFunnelDraftTransaction(tx, {
+          brandId: authResult.session.user.id,
+          draftId: draft.id,
+          funnel,
+        }),
+      );
+      const totalPrice = result.payment.amount;
+      return NextResponse.json({
+        campaignId: result.campaign.id,
+        paymentId: result.payment.id,
+        status: "READY_FOR_PAYMENT",
+        totalPrice,
+        invoiceNumber: toInvoiceNumber(result.payment.id, result.payment.createdAt),
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "캠페인 생성 실패";
+      return NextResponse.json({ error: msg }, { status: 400 });
+    }
   }
 
   const data = (draft.data as DraftData) ?? {};

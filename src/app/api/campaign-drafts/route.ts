@@ -1,21 +1,16 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import type { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/api-auth";
-import { draftPayloadSchema } from "@/lib/visit-campaign";
-
-const createSchema = z.object({
-  name: z.string().optional(),
-  currentStep: z.number().int().min(1).max(3).optional(),
-  data: draftPayloadSchema.shape.data.optional(),
-});
+import { campaignDraftUpsertSchema } from "@/lib/visit-campaign";
 
 export async function POST(request: Request) {
   const authResult = await requireRole("BRAND");
   if (!authResult.ok) return authResult.response;
 
   const body = await request.json().catch(() => null);
-  const parsed = createSchema.safeParse(body ?? {});
+  const parsed = campaignDraftUpsertSchema.safeParse(body ?? {});
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
@@ -25,7 +20,7 @@ export async function POST(request: Request) {
       brandId: authResult.session.user.id,
       name: parsed.data.name,
       currentStep: parsed.data.currentStep ?? 1,
-      data: parsed.data.data ?? {},
+      data: (parsed.data.data ?? {}) as Prisma.InputJsonValue,
       autosaveVersion: 1,
     },
   });

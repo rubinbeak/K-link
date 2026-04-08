@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { CalendarDays, Camera, Globe2, Megaphone, Package, Store, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -58,6 +58,8 @@ export function ConsultingForm() {
   const [requestSaving, setRequestSaving] = useState(false)
   const [requestSaved, setRequestSaved] = useState(false)
   const [showThanksBanner, setShowThanksBanner] = useState(false)
+  const [submitError, setSubmitError] = useState("")
+  const formRef = useRef<HTMLFormElement>(null)
 
   const isUndecidedBenefit = benefits.includes("아직 미정")
 
@@ -109,9 +111,56 @@ export function ConsultingForm() {
 
   async function submitConsultingRequest() {
     if (!submitted || requestSaving || requestSaved) return
+    const form = formRef.current
+    if (!form) return
 
     setRequestSaving(true)
     setShowThanksBanner(false)
+    setSubmitError("")
+
+    const fd = new FormData(form)
+    const brandName = String(fd.get("brandName") ?? "").trim()
+    const managerProfile = String(fd.get("managerProfile") ?? "").trim()
+    const email = String(fd.get("email") ?? "").trim()
+    const phone = String(fd.get("phone") ?? "").trim()
+    const eventName = String(fd.get("eventName") ?? "").trim()
+    const eventLocation = String(fd.get("eventLocation") ?? "").trim()
+    const additionalNotes = String(fd.get("additionalNotes") ?? "").trim()
+
+    const goalLabels = goalOptions.filter((goal) => goals.includes(goal.value)).map((goal) => goal.label)
+
+    try {
+      const res = await fetch("/api/consulting-leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brandName,
+          managerProfile,
+          email,
+          phone: phone || null,
+          eventName: eventName || null,
+          eventLocation,
+          eventStartDate,
+          eventEndDate,
+          campaignTypes,
+          goalValues: goals,
+          goalLabels,
+          influencerScale,
+          benefits,
+          additionalNotes: additionalNotes || null,
+        }),
+      })
+      if (!res.ok) {
+        await res.json().catch(() => null)
+        setSubmitError("접수 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.")
+        setRequestSaving(false)
+        return
+      }
+    } catch {
+      setSubmitError("네트워크 오류로 저장하지 못했습니다.")
+      setRequestSaving(false)
+      return
+    }
 
     window.open(CONSULTING_SCHEDULE_URL, "_blank", "noopener,noreferrer")
     setRequestSaved(true)
@@ -123,7 +172,7 @@ export function ConsultingForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-7 sm:space-y-8">
+    <form ref={formRef} onSubmit={onSubmit} className="space-y-7 sm:space-y-8">
       <section className="rounded-2xl border border-white/60 bg-zinc-50/70 p-5 sm:p-6">
         <div className="mb-4">
           <p className="text-[11px] font-semibold tracking-widest text-primary">1. 기본 정보</p>
@@ -358,6 +407,8 @@ export function ConsultingForm() {
           {requestSaving ? "제출 중..." : requestSaved ? "제출 완료" : "제출하기"}
         </Button>
       </div>
+
+      {submitError ? <p className="text-center text-sm text-destructive">{submitError}</p> : null}
 
       {requestSaved ? (
         <p className="text-center text-sm font-medium text-primary">

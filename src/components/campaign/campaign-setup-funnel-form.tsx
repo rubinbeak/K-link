@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarDays, Check, Clock3, Plus, Save, ShieldCheck, Sparkles, Trash2, WandSparkles } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { benefitLabel, BENEFIT_VALUES, platformLabel, PLATFORM_VALUES, regionLabel, REGION_VALUES } from "@/lib/visit-campaign";
 import { useCampaignFormAutosave } from "@/components/campaign/use-campaign-form-autosave";
+import { isFunnelDraftData, type FunnelDraftPayload } from "@/lib/funnel-campaign-finalize";
 
 const PLACE_OPTIONS = [
   { value: "BEAUTY_STORE", label: "뷰티 매장" },
@@ -142,9 +144,44 @@ function toggleArrayItem(arr: string[], value: string) {
   return arr.includes(value) ? arr.filter((x) => x !== value) : [...arr, value];
 }
 
-export function CampaignSetupFunnelForm() {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<CampaignSetupFormData>(defaultData);
+function mergeServerDraftIntoForm(defaults: CampaignSetupFormData, raw: unknown): CampaignSetupFormData {
+  if (!isFunnelDraftData(raw)) return defaults;
+  const d = raw as Partial<FunnelDraftPayload> & Pick<FunnelDraftPayload, "step1">;
+  const s2 = d.step2;
+  return {
+    step1: { ...defaults.step1, ...d.step1 },
+    step2: {
+      ...defaults.step2,
+      ...(s2 ?? {}),
+      draftPlace: { ...defaults.step2.draftPlace, ...(s2?.draftPlace ?? {}) },
+      places: Array.isArray(s2?.places) ? s2.places : defaults.step2.places,
+    },
+    step3: { ...defaults.step3, ...d.step3 },
+  };
+}
+
+export function CampaignSetupFunnelForm({
+  initialDraftId,
+  initialDraftData,
+  initialStep,
+}: {
+  initialDraftId?: string;
+  initialDraftData?: unknown;
+  initialStep?: number;
+} = {}) {
+  const router = useRouter();
+  const [step, setStep] = useState(() =>
+    initialStep !== undefined && initialStep >= 1 && initialStep <= 3 ? initialStep : 1,
+  );
+  const [draftId, setDraftId] = useState(initialDraftId ?? "");
+  const [formData, setFormData] = useState<CampaignSetupFormData>(() =>
+    mergeServerDraftIntoForm(defaultData, initialDraftData),
+  );
+  const [savingServer, setSavingServer] = useState(false);
+  const [savedAtServer, setSavedAtServer] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [finalizing, setFinalizing] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isClinic = formData.step1.placeType === "CLINIC";
   const purposeOptions = isClinic ? CLINIC_PURPOSE_OPTIONS : DEFAULT_PURPOSE_OPTIONS;
@@ -190,18 +227,112 @@ export function CampaignSetupFunnelForm() {
       place.operationEndTime <= place.operationStartTime,
   );
 
+  const loadedFromServer = Boolean(initialDraftId && initialDraftData && isFunnelDraftData(initialDraftData));
+
   const { saveNow, lastSavedAt, toastMessage } = useCampaignFormAutosave<CampaignSetupFormData>({
-    storageKey: "klink:campaign-setup:public-v1",
+    storageKey: `klink:campaign-setup:funnel:${draftId || initialDraftId || "new"}`,
     data: formData,
+    skipRestore: loadedFromServer,
     onRestore: (restored) =>
       setFormData((prev) => ({
         ...prev,
         ...restored,
         step1: { ...prev.step1, ...(restored.step1 ?? {}) },
-        step2: { ...prev.step2, ...(restored.step2 ?? {}) },
+        step2: {
+          ...prev.step2,
+          ...(restored.step2 ?? {}),
+          draftPlace: { ...prev.step2.draftPlace, ...(restored.step2?.draftPlace ?? {}) },
+          places: restored.step2?.places ?? prev.step2.places,
+        },
         step3: { ...prev.step3, ...(restored.step3 ?? {}) },
       })),
   });
+
+  async function saveDraftServer(mode: "manual" | "auto") {
+    const canSync =
+      Boolean(draftId) ||
+      formData.step1.contactBrandName.trim().length > 0 ||
+      formData.step1.campaignName.trim().length > 0;
+    if (!canSync && mode === "auto") return;
+
+    setSavingServer(true);
+    if (mode === "manual") setServerError("");
+    const payload = {
+      name:
+        formData.step1.campaignName?.trim() ||
+        formData.step1.contactBrandName?.trim() ||
+        "방문형 콘텐츠 캠페인",
+      currentStep: step,
+      data: {
+        formKind: "funnel" as const,
+        step1: formData.step1,
+        step2: formData.step2,
+        step3: formData.step3,
+      },
+    };
+    try {
+      let response: Response;
+      if (!draftId) {
+        response = await fetch("/api/campaign-drafts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        response = await fetch(`/api/campaign-drafts/${draftId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+      const json = (await response.json()) as { draftId?: string; error?: string };
+      if (!response.ok) throw new Error(typeof json.error === "string" ? json.error : "저장 실패");
+      if (!draftId && json.draftId) {
+        setDraftId(json.draftId);
+        router.replace(`/campaign/setup/${json.draftId}`);
+      }
+      setSavedAtServer(
+        new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+      );
+      saveNow();
+    } catch (e) {
+      if (mode === "manual") setServerError(e instanceof Error ? e.message : "서버 저장에 실패했습니다.");
+    } finally {
+      setSavingServer(false);
+    }
+  }
+
+  async function finalizeCampaign() {
+    if (!draftId) {
+      await saveDraftServer("manual");
+      return;
+    }
+    setFinalizing(true);
+    setServerError("");
+    const res = await fetch(`/api/campaign-drafts/${draftId}/finalize`, { method: "POST" });
+    const json = (await res.json()) as { paymentId?: string; error?: string };
+    setFinalizing(false);
+    if (!res.ok) {
+      setServerError(typeof json.error === "string" ? json.error : "캠페인 생성 실패");
+      return;
+    }
+    if (json.paymentId) router.push(`/brand/payments/${json.paymentId}/invoice`);
+  }
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => void saveDraftServer("auto"), 10000);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData, step, draftId]);
+
+  useEffect(() => {
+    const id = setInterval(() => void saveDraftServer("auto"), 300000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData, step, draftId]);
 
   useEffect(() => {
     setFormData((prev) => {
@@ -297,9 +428,15 @@ export function CampaignSetupFunnelForm() {
                   <div>
                     <CardTitle className="font-heading text-2xl">캠페인 세팅</CardTitle>
                   </div>
-                  <Button type="button" variant="outline" onClick={saveNow} className="gap-2 border-zinc-300 bg-white hover:bg-zinc-50">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={savingServer}
+                    onClick={() => void saveDraftServer("manual")}
+                    className="gap-2 border-zinc-300 bg-white hover:bg-zinc-50"
+                  >
                     <Save className="size-4" />
-                    임시 저장
+                    {savingServer ? "서버 저장 중..." : "서버에 임시 저장"}
                   </Button>
                 </div>
 
@@ -329,6 +466,11 @@ export function CampaignSetupFunnelForm() {
                     ))}
                   </div>
                 </div>
+                {serverError ? (
+                  <p className="text-sm text-destructive" role="alert">
+                    {serverError}
+                  </p>
+                ) : null}
               </CardHeader>
             </Card>
 
@@ -926,10 +1068,16 @@ export function CampaignSetupFunnelForm() {
                   ) : null}
                   {step === 3 ? (
                     <>
-                      <Link href="/brand/payments" className={cn(buttonVariants({ size: "lg" }), "gap-2 bg-[#ff2f9b] text-white hover:bg-[#e61c8d]")}>
-                        결제하기
+                      <Button
+                        type="button"
+                        size="lg"
+                        disabled={finalizing || savingServer}
+                        onClick={() => void finalizeCampaign()}
+                        className="gap-2 bg-[#ff2f9b] text-white hover:bg-[#e61c8d]"
+                      >
+                        {finalizing ? "캠페인 생성 중..." : "결제하기"}
                         <ArrowRight className="size-4" />
-                      </Link>
+                      </Button>
                       <Link href="/consulting" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
                         캠페인 상담받기
                       </Link>
@@ -975,11 +1123,15 @@ export function CampaignSetupFunnelForm() {
             <Card className={cardBase}>
               <CardHeader>
                 <CardTitle className="text-lg">저장 상태</CardTitle>
-                <CardDescription>{lastSavedAt ? `마지막 저장: ${lastSavedAt}` : "아직 저장 기록이 없습니다."}</CardDescription>
+                <CardDescription>
+                  {savedAtServer ? `서버 저장: ${savedAtServer}` : "서버에 아직 동기화되지 않았습니다."}
+                </CardDescription>
               </CardHeader>
               <CardContent className="text-sm text-zinc-600">
-                <p>상단 임시 저장 버튼과 5분 자동 저장이 함께 동작합니다.</p>
-                <p className="mt-2">브라우저를 닫아도 현재 기기에서는 작성 내용을 다시 불러올 수 있습니다.</p>
+                <p>로그인 계정 기준으로 초안이 DB에 저장됩니다. 입력 후 10초·5분마다 자동 동기화됩니다.</p>
+                <p className="mt-2">
+                  이 기기 로컬: {lastSavedAt ? `마지막 저장 ${lastSavedAt}` : "기록 없음"} (보조 백업)
+                </p>
               </CardContent>
             </Card>
 

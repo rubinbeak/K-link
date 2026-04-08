@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/api-auth";
-import { draftPayloadSchema } from "@/lib/visit-campaign";
+import { campaignDraftUpsertSchema } from "@/lib/visit-campaign";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ draftId: string }> }) {
   const authResult = await requireRole("BRAND");
@@ -37,7 +38,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ dr
   }
 
   const body = await request.json().catch(() => null);
-  const parsed = draftPayloadSchema.partial().safeParse(body ?? {});
+  const parsed = campaignDraftUpsertSchema.partial().safeParse(body ?? {});
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
@@ -45,7 +46,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ dr
   const merged = {
     ...(existing.data as object),
     ...(parsed.data.data ?? {}),
-  };
+  } as Prisma.InputJsonValue;
 
   const draft = await prisma.campaignDraft.update({
     where: { id: draftId },

@@ -49,28 +49,22 @@ export default async function BrandDashboardPage() {
 
   return (
     <div className="space-y-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-heading text-3xl font-semibold tracking-tight">캠페인</h1>
-          <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-            지원자를 검토하고 크리에이터를 선정하며, 협업 진행 상황을 확인할 수 있습니다.
-          </p>
-        </div>
-        <Link href="/campaign/setup" className={cn(buttonVariants())}>
-          캠페인 세팅하기
-        </Link>
-      </div>
+      <h1 className="font-heading text-center text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+        마이페이지
+      </h1>
 
       <BrandBasicInfoSection initialProfile={initialProfile} />
 
       {campaigns.length === 0 ? (
         <Card className="border-dashed">
-          <CardHeader>
-            <CardTitle>등록된 캠페인이 없습니다</CardTitle>
-            <CardDescription>첫 캠페인을 만들고 글로벌 크리에이터를 초대해 보세요.</CardDescription>
+          <CardHeader className="items-center justify-items-center space-y-2 text-center">
+            <CardTitle className="text-xl">등록된 캠페인이 없습니다</CardTitle>
+            <CardDescription className="mx-auto max-w-md text-pretty text-base">
+              첫 캠페인을 만들고 글로벌 크리에이터를 초대해 보세요.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Link href="/campaign/setup" className={cn(buttonVariants())}>
+          <CardContent className="flex justify-center pt-2">
+            <Link href="/campaign/setup" className={cn(buttonVariants({ size: "lg" }))}>
               캠페인 세팅 시작하기
             </Link>
           </CardContent>

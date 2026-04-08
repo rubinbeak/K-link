@@ -14,6 +14,8 @@ import { benefitLabel, BENEFIT_VALUES, platformLabel, PLATFORM_VALUES, regionLab
 import { useCampaignFormAutosave } from "@/components/campaign/use-campaign-form-autosave";
 import { isFunnelDraftData, type FunnelDraftPayload } from "@/lib/funnel-campaign-finalize";
 import { mergeBrandProfileIntoStep1, type BrandContactStep1 } from "@/lib/brand-profile";
+import { CampaignSubmitInstructionsModal } from "@/components/campaign/campaign-submit-instructions-modal";
+import type { CampaignSubmitInstructions } from "@/lib/campaign-submit-instructions";
 
 const PLACE_OPTIONS = [
   { value: "BEAUTY_STORE", label: "뷰티 매장" },
@@ -166,12 +168,14 @@ export function CampaignSetupFunnelForm({
   initialDraftData,
   initialStep,
   initialBrandProfile,
+  submitInstructions,
 }: {
   initialDraftId?: string;
   initialDraftData?: unknown;
   initialStep?: number;
   initialBrandProfile?: BrandContactStep1;
-} = {}) {
+  submitInstructions: CampaignSubmitInstructions;
+}) {
   const router = useRouter();
   const [step, setStep] = useState(() =>
     initialStep !== undefined && initialStep >= 1 && initialStep <= 3 ? initialStep : 1,
@@ -189,6 +193,7 @@ export function CampaignSetupFunnelForm({
   const [savedAtServer, setSavedAtServer] = useState("");
   const [serverError, setServerError] = useState("");
   const [finalizing, setFinalizing] = useState(false);
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isClinic = formData.step1.placeType === "CLINIC";
@@ -256,12 +261,12 @@ export function CampaignSetupFunnelForm({
       })),
   });
 
-  async function saveDraftServer(mode: "manual" | "auto") {
+  async function saveDraftServer(mode: "manual" | "auto"): Promise<string | null> {
     const canSync =
       Boolean(draftId) ||
       formData.step1.contactBrandName.trim().length > 0 ||
       formData.step1.campaignName.trim().length > 0;
-    if (!canSync && mode === "auto") return;
+    if (!canSync && mode === "auto") return draftId || null;
 
     setSavingServer(true);
     if (mode === "manual") setServerError("");
@@ -295,7 +300,9 @@ export function CampaignSetupFunnelForm({
       }
       const json = (await response.json()) as { draftId?: string; error?: string };
       if (!response.ok) throw new Error(typeof json.error === "string" ? json.error : "저장 실패");
+      let effectiveId = draftId;
       if (!draftId && json.draftId) {
+        effectiveId = json.draftId;
         setDraftId(json.draftId);
         router.replace(`/campaign/setup/${json.draftId}`);
       }
@@ -303,28 +310,38 @@ export function CampaignSetupFunnelForm({
         new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
       );
       saveNow();
+      return effectiveId;
     } catch (e) {
       if (mode === "manual") setServerError(e instanceof Error ? e.message : "서버 저장에 실패했습니다.");
+      return null;
     } finally {
       setSavingServer(false);
     }
   }
 
   async function finalizeCampaign() {
-    if (!draftId) {
-      await saveDraftServer("manual");
-      return;
-    }
     setFinalizing(true);
     setServerError("");
-    const res = await fetch(`/api/campaign-drafts/${draftId}/finalize`, { method: "POST" });
-    const json = (await res.json()) as { paymentId?: string; error?: string };
-    setFinalizing(false);
-    if (!res.ok) {
-      setServerError(typeof json.error === "string" ? json.error : "캠페인 생성 실패");
-      return;
+    try {
+      let id = draftId;
+      if (!id) {
+        id = (await saveDraftServer("manual")) ?? "";
+      }
+      if (!id) {
+        setServerError("저장에 실패했거나 초안 ID를 확인할 수 없습니다. 필수 정보를 입력한 뒤 다시 시도해 주세요.");
+        return;
+      }
+      const res = await fetch(`/api/campaign-drafts/${id}/finalize`, { method: "POST" });
+      const json = (await res.json()) as { paymentId?: string; error?: string };
+      if (!res.ok) {
+        setServerError(typeof json.error === "string" ? json.error : "캠페인 생성 실패");
+        return;
+      }
+      setSubmitModalOpen(false);
+      if (json.paymentId) router.push(`/brand/payments/${json.paymentId}/invoice`);
+    } finally {
+      setFinalizing(false);
     }
-    if (json.paymentId) router.push(`/brand/payments/${json.paymentId}/invoice`);
   }
 
   useEffect(() => {
@@ -1080,10 +1097,10 @@ export function CampaignSetupFunnelForm({
                         type="button"
                         size="lg"
                         disabled={finalizing || savingServer}
-                        onClick={() => void finalizeCampaign()}
+                        onClick={() => setSubmitModalOpen(true)}
                         className="gap-2 bg-[#ff2f9b] text-white hover:bg-[#e61c8d]"
                       >
-                        {finalizing ? "캠페인 생성 중..." : "결제하기"}
+                        {finalizing ? "제출 중…" : "제출하기"}
                         <ArrowRight className="size-4" />
                       </Button>
                       <Link href="/consulting" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
@@ -1125,6 +1142,9 @@ export function CampaignSetupFunnelForm({
                 </p>
                 <p className="text-xs text-zinc-500">총 인원: {pricingSummary.headcount}명</p>
                 <p className="text-xs text-zinc-500">* 최종 금액은 인원/국가/일정 확정 후 안내됩니다.</p>
+                <p className="text-xs text-zinc-500">
+                  제출하기를 누르면 입금 안내를 확인한 뒤 캠페인을 확정하고, 이어서 인보이스(무통장) 페이지로 이동합니다.
+                </p>
               </CardContent>
             </Card>
 
@@ -1174,6 +1194,14 @@ export function CampaignSetupFunnelForm({
           </div>
         </div>
       ) : null}
+
+      <CampaignSubmitInstructionsModal
+        open={submitModalOpen}
+        onOpenChange={setSubmitModalOpen}
+        instructions={submitInstructions}
+        onConfirm={() => void finalizeCampaign()}
+        busy={finalizing || savingServer}
+      />
     </div>
   );
 }

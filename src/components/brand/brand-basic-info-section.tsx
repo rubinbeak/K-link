@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,10 +50,6 @@ export function BrandBasicInfoSection({
   return (
     <section className={cn("rounded-2xl border border-zinc-200/80 bg-white/90 shadow-sm", className)}>
       <div className={sectionCard}>
-        <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-primary">
-          <Sparkles className="size-3.5" aria-hidden />
-          1. 기본 정보
-        </p>
         <h2 className="mb-4 text-lg font-semibold tracking-tight text-zinc-900">담당자 정보를 알려주세요</h2>
         <p className="mb-4 text-sm text-zinc-600">
           아래 정보는 캠페인 세팅·상담 신청 시 자동으로 불러오며, 한 곳에서 수정하면 모두 동일하게 적용됩니다.

@@ -3,6 +3,7 @@ import { CampaignSetupFunnelForm } from "@/components/campaign/campaign-setup-fu
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { userToBrandContactStep1 } from "@/lib/brand-profile";
+import { getCampaignSubmitInstructions } from "@/lib/campaign-submit-instructions";
 
 export default async function CampaignSetupPage() {
   const session = await auth();
@@ -26,5 +27,7 @@ export default async function CampaignSetupPage() {
     },
   );
 
-  return <CampaignSetupFunnelForm initialBrandProfile={initialBrandProfile} />;
+  const submitInstructions = getCampaignSubmitInstructions();
+
+  return <CampaignSetupFunnelForm initialBrandProfile={initialBrandProfile} submitInstructions={submitInstructions} />;
 }

@@ -1,23 +1,9 @@
 /**
- * 비동기 API 이후에는 window.open이 팝업 차단되는 경우가 많습니다.
- * async 함수의 첫 줄(첫 await 전)에서 호출해 빈 탭을 먼저 열고, 성공 시 URL만 바꿉니다.
+ * 제출 직후(첫 await 전) 동기로 호출하세요. 실제 Next 페이지를 열어
+ * `about:blank`에 URL을 나중에 대입하는 방식의 브라우저 차단을 피합니다.
  */
-export function openPendingCompleteTab(): WindowProxy | null {
+export function openFinalizePendingTab(draftId: string): WindowProxy | null {
   if (typeof window === "undefined") return null;
-  return window.open("about:blank", "_blank");
-}
-
-export function assignCompletePageToTab(
-  tab: WindowProxy | null,
-  paymentId: string,
-  fallbackSameWindowNavigate: (path: string) => void,
-) {
-  if (typeof window === "undefined") return;
-  const path = `/campaign/setup/complete/${paymentId}`;
-  const url = `${window.location.origin}${path}`;
-  if (tab && !tab.closed) {
-    tab.location.href = url;
-  } else {
-    fallbackSameWindowNavigate(path);
-  }
+  const url = `${window.location.origin}/campaign/setup/complete/pending?draftId=${encodeURIComponent(draftId)}`;
+  return window.open(url, "_blank");
 }

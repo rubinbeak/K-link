@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { assignCompletePageToTab, openPendingCompleteTab } from "@/lib/campaign-post-submit";
+import { openFinalizePendingTab } from "@/lib/campaign-post-submit";
 import {
   BENEFIT_VALUES,
   benefitLabel,
@@ -112,7 +112,6 @@ export function CampaignSetupWizard({
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [finalizing, setFinalizing] = useState(false);
   const [data, setData] = useState<CampaignDraftData>({
     ...defaultData,
     ...initialData,
@@ -188,28 +187,10 @@ export function CampaignSetupWizard({
       await saveDraft("manual");
       return;
     }
-    const pendingTab = openPendingCompleteTab();
-    setFinalizing(true);
     setError("");
-    try {
-      const res = await fetch(`/api/campaign-drafts/${draftId}/finalize`, { method: "POST" });
-      const json = await res.json();
-      if (!res.ok) {
-        pendingTab?.close();
-        setError(json.error ?? "캠페인 생성 실패");
-        return;
-      }
-      if (json?.paymentId) {
-        assignCompletePageToTab(pendingTab, json.paymentId, (path) => router.push(path));
-        return;
-      }
-      pendingTab?.close();
-      router.push("/brand");
-    } catch {
-      pendingTab?.close();
-      setError("제출 중 오류가 발생했습니다. 다시 시도해 주세요.");
-    } finally {
-      setFinalizing(false);
+    const tab = openFinalizePendingTab(draftId);
+    if (!tab || tab.closed) {
+      router.push(`/campaign/setup/complete/pending?draftId=${encodeURIComponent(draftId)}`);
     }
   }
 
@@ -626,8 +607,8 @@ export function CampaignSetupWizard({
             다음
           </Button>
           {step === 3 ? (
-            <Button type="button" onClick={finalizeCampaign} disabled={finalizing}>
-              {finalizing ? "입금 안내 생성 중..." : "캠페인 세팅 및 결제 완료하기"}
+            <Button type="button" onClick={() => void finalizeCampaign()}>
+              캠페인 세팅 및 결제 완료하기
             </Button>
           ) : null}
         </div>

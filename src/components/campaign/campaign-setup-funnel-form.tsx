@@ -14,7 +14,7 @@ import { benefitLabel, BENEFIT_VALUES, platformLabel, PLATFORM_VALUES, regionLab
 import { useCampaignFormAutosave } from "@/components/campaign/use-campaign-form-autosave";
 import { isFunnelDraftData, type FunnelDraftPayload } from "@/lib/funnel-campaign-finalize";
 import { mergeBrandProfileIntoStep1, type BrandContactStep1 } from "@/lib/brand-profile";
-import { assignCompletePageToTab, openPendingCompleteTab } from "@/lib/campaign-post-submit";
+import { openFinalizePendingTab } from "@/lib/campaign-post-submit";
 
 const PLACE_OPTIONS = [
   { value: "BEAUTY_STORE", label: "뷰티 매장" },
@@ -367,11 +367,16 @@ export function CampaignSetupFunnelForm({
   }
 
   async function finalizeCampaign() {
-    const pendingTab = openPendingCompleteTab();
+    const idFromState = draftId;
+    let pendingTab: WindowProxy | null = null;
+    if (idFromState) {
+      pendingTab = openFinalizePendingTab(idFromState);
+    }
+
     setFinalizing(true);
     setServerError("");
     try {
-      let id = draftId;
+      let id = idFromState;
       if (!id) {
         id = (await saveDraftServer("manual")) ?? "";
       }
@@ -380,24 +385,16 @@ export function CampaignSetupFunnelForm({
         setServerError("저장에 실패했거나 초안 ID를 확인할 수 없습니다. 필수 정보를 입력한 뒤 다시 시도해 주세요.");
         return;
       }
-      const res = await fetch(`/api/campaign-drafts/${id}/finalize`, { method: "POST" });
-      const json = (await res.json()) as { paymentId?: string; error?: string };
-      if (!res.ok) {
-        pendingTab?.close();
-        setServerError(typeof json.error === "string" ? json.error : "캠페인 생성 실패");
+
+      if (pendingTab && !pendingTab.closed) {
+        setSubmitSuccessMessage(
+          "새 창에서 제출 처리 후 결제·인보이스 안내가 열립니다. 새 창을 닫지 말고 안내를 따라 주세요.",
+        );
         return;
       }
-      if (json.paymentId) {
-        assignCompletePageToTab(pendingTab, json.paymentId, (path) => router.push(path));
-        setSubmitSuccessMessage(
-          pendingTab && !pendingTab.closed
-            ? "캠페인 세팅이 완료되었습니다. 새 창에서 결제·인보이스 안내를 확인해 주세요."
-            : "캠페인 세팅이 완료되었습니다. 아래 페이지로 이동했습니다. 결제·인보이스 안내를 확인해 주세요.",
-        );
-      } else {
-        pendingTab?.close();
-        setServerError("결제 정보를 불러오지 못했습니다. 고객센터로 문의해 주세요.");
-      }
+
+      router.push(`/campaign/setup/complete/pending?draftId=${encodeURIComponent(id)}`);
+      setSubmitSuccessMessage("결제·인보이스 안내 페이지로 이동합니다.");
     } catch {
       pendingTab?.close();
       setServerError("제출 중 오류가 발생했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.");

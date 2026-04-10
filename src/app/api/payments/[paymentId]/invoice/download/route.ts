@@ -44,8 +44,15 @@ export async function GET(_request: Request, { params }: { params: Promise<{ pay
   try {
     pdf = await renderPaymentInvoicePdf(detail);
   } catch (e) {
-    console.error("[invoice-pdf]", e);
-    return NextResponse.json({ error: "PDF 생성에 실패했습니다." }, { status: 500 });
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[invoice-pdf]", msg, e);
+    return NextResponse.json(
+      {
+        error: "PDF 생성에 실패했습니다.",
+        hint: "배포 환경에서 폰트를 받지 못한 경우입니다. 저장소의 public/fonts/README.md 를 참고해 NotoSansKR-Regular.ttf 를 추가해 주세요.",
+      },
+      { status: 500 },
+    );
   }
 
   const safeFile = detail.invoiceNumber.replace(/[^\w.-]+/g, "_");

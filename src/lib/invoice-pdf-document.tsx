@@ -1,16 +1,6 @@
 import React from "react";
-import { Document, Font, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { PaymentInvoiceDetailView } from "@/lib/payment-invoice-detail";
-
-const FONT_URL =
-  "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanskr/static/NotoSansKR-Regular.ttf";
-
-let fontRegistered = false;
-function ensureKoreanFont() {
-  if (fontRegistered) return;
-  Font.register({ family: "NotoSansKR", src: FONT_URL });
-  fontRegistered = true;
-}
 
 const styles = StyleSheet.create({
   page: {
@@ -44,8 +34,6 @@ function KvRow({ label, value }: { label: string; value: string }) {
 }
 
 export function InvoicePdfDocument({ detail }: { detail: PaymentInvoiceDetailView }) {
-  ensureKoreanFont();
-
   const vatLine =
     detail.vatKrw > 0 ? `${detail.vatKrw.toLocaleString("ko-KR")}원` : "— (별도 안내)";
 

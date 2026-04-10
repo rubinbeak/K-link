@@ -77,7 +77,7 @@ export function FinalizePendingClient() {
               {phase === "redirecting" ? "결제 안내로 이동 중…" : "캠페인 제출 처리 중…"}
             </h1>
             <p className="mt-2 text-sm text-zinc-600">
-              잠시만 기다려 주세요. DB에 반영한 뒤 인보이스·입금 안내 화면으로 연결합니다.
+              잠시만 기다려 주세요. <br/>DB에 반영한 뒤 인보이스·입금 안내 화면으로 연결됩니다.
             </p>
           </div>
         ) : (

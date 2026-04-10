@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
-import { buildPaymentInvoiceDetail, renderInvoiceHtmlDocument } from "@/lib/payment-invoice-detail";
+import { buildPaymentInvoiceDetail } from "@/lib/payment-invoice-detail";
+import { renderPaymentInvoicePdf } from "@/lib/render-invoice-pdf";
+
+export const runtime = "nodejs";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ paymentId: string }> }) {
   const authResult = await requireAuth();
@@ -37,13 +40,20 @@ export async function GET(_request: Request, { params }: { params: Promise<{ pay
     pricing: payment.campaign?.pricing ?? null,
   });
 
-  const html = renderInvoiceHtmlDocument(detail);
+  let pdf: Buffer;
+  try {
+    pdf = await renderPaymentInvoicePdf(detail);
+  } catch (e) {
+    console.error("[invoice-pdf]", e);
+    return NextResponse.json({ error: "PDF 생성에 실패했습니다." }, { status: 500 });
+  }
+
   const safeFile = detail.invoiceNumber.replace(/[^\w.-]+/g, "_");
-  return new NextResponse(html, {
+  return new NextResponse(new Uint8Array(pdf), {
     status: 200,
     headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${safeFile}.html"`,
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${safeFile}.pdf"`,
       "Cache-Control": "private, no-store",
     },
   });

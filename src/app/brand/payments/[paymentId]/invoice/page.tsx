@@ -82,7 +82,7 @@ export default async function BrandInvoicePage({ params }: { params: Promise<{ p
       <Card>
         <CardHeader>
           <CardTitle>입금 계좌 정보</CardTitle>
-          <CardDescription>입금 시 반드시 참조코드(Reference)를 함께 전달해 주세요.</CardDescription>
+          <CardDescription>아래 계좌로 안내된 금액을 입금해 주세요.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-2 text-sm">
           <p>
@@ -93,9 +93,6 @@ export default async function BrandInvoicePage({ params }: { params: Promise<{ p
           </p>
           <p>
             예금주: <span className="font-medium">{invoice.bankInfo.accountHolder}</span>
-          </p>
-          <p>
-            참조코드: <span className="font-medium">{invoice.bankInfo.reference}</span>
           </p>
         </CardContent>
       </Card>

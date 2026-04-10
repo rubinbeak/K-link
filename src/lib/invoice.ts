@@ -41,7 +41,6 @@ export function buildInvoice(input: InvoiceInput) {
       bankName: process.env.BANK_NAME ?? "IBK 기업은행",
       accountNumber: process.env.BANK_ACCOUNT_NUMBER ?? "289-127559-04-029",
       accountHolder: process.env.BANK_ACCOUNT_HOLDER ?? "백은진",
-      reference: invoiceNumber,
     },
   };
 }

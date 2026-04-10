@@ -1,14 +1,5 @@
 import { buildInvoice, tryDecomposeVatInclusive } from "@/lib/invoice";
 
-export function escapeHtml(raw: string): string {
-  return raw
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
 export type PaymentInvoiceDetailView = {
   invoiceNumber: string;
   issuedAt: Date;
@@ -35,7 +26,6 @@ export type PaymentInvoiceDetailView = {
   bankName: string;
   accountNumber: string;
   accountHolder: string;
-  reference: string;
   issuerName: string;
   issuerEmail: string;
   issuerPhone: string;
@@ -137,83 +127,8 @@ export function buildPaymentInvoiceDetail(input: {
     bankName: base.bankInfo.bankName,
     accountNumber: base.bankInfo.accountNumber,
     accountHolder: base.bankInfo.accountHolder,
-    reference: base.bankInfo.reference,
     issuerName: issuer.name,
     issuerEmail: issuer.email,
     issuerPhone: issuer.phone || "—",
   };
-}
-
-export function renderInvoiceHtmlDocument(d: PaymentInvoiceDetailView): string {
-  const rows = [
-    ["Invoice 번호", d.invoiceNumber],
-    ["발행일 (Invoice Date)", d.issuedAt.toLocaleDateString("ko-KR")],
-    ["납부 기한 (Due Date)", d.dueDate.toLocaleDateString("ko-KR")],
-    ["공급자", `${d.supplierName}${d.supplierBusinessRegNo ? ` (사업자등록번호 ${d.supplierBusinessRegNo})` : ""}`],
-    ["공급자 주소", d.supplierAddress],
-    ["고객사(브랜드)", d.clientCompanyName],
-    ["고객 담당자", d.clientManagerLine],
-    ["고객 이메일", d.clientEmail],
-    ["고객 연락처", d.clientPhone],
-    ["캠페인 ID", d.campaignId],
-    ["캠페인명", d.campaignTitle],
-    ["서비스 내용", d.serviceNarrative],
-  ];
-
-  const tableRows = rows
-    .map(
-      ([k, v]) =>
-        `<tr><th style="text-align:left;border:1px solid #ccc;padding:8px;width:200px;background:#f8f8f8">${escapeHtml(k)}</th><td style="border:1px solid #ccc;padding:8px;white-space:pre-wrap">${escapeHtml(v)}</td></tr>`,
-    )
-    .join("");
-
-  const moneyRows = `
-    <tr>
-      <th style="text-align:left;border:1px solid #ccc;padding:8px;background:#f8f8f8">품목</th>
-      <th style="text-align:right;border:1px solid #ccc;padding:8px;background:#f8f8f8">단가 (KRW)</th>
-      <th style="text-align:right;border:1px solid #ccc;padding:8px;background:#f8f8f8">수량</th>
-      <th style="text-align:right;border:1px solid #ccc;padding:8px;background:#f8f8f8">금액 (KRW)</th>
-    </tr>
-    <tr>
-      <td style="border:1px solid #ccc;padding:8px">${escapeHtml(d.lineDescription)}</td>
-      <td style="border:1px solid #ccc;padding:8px;text-align:right">${d.unitPriceKrw.toLocaleString("ko-KR")}</td>
-      <td style="border:1px solid #ccc;padding:8px;text-align:right">${d.quantity}</td>
-      <td style="border:1px solid #ccc;padding:8px;text-align:right">${d.lineAmountKrw.toLocaleString("ko-KR")}</td>
-    </tr>
-    <tr>
-      <td colspan="3" style="border:1px solid #ccc;padding:8px;text-align:right;font-weight:600">공급가액</td>
-      <td style="border:1px solid #ccc;padding:8px;text-align:right">${d.subtotalKrw.toLocaleString("ko-KR")}</td>
-    </tr>
-    <tr>
-      <td colspan="3" style="border:1px solid #ccc;padding:8px;text-align:right;font-weight:600">부가세 (10%)</td>
-      <td style="border:1px solid #ccc;padding:8px;text-align:right">${d.vatKrw > 0 ? d.vatKrw.toLocaleString("ko-KR") : "—"}</td>
-    </tr>
-    <tr>
-      <td colspan="3" style="border:1px solid #ccc;padding:8px;text-align:right;font-weight:700">합계 (납부 금액)</td>
-      <td style="border:1px solid #ccc;padding:8px;text-align:right;font-weight:700">${d.totalKrw.toLocaleString("ko-KR")}</td>
-    </tr>
-  `;
-
-  return `<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <title>${escapeHtml(d.invoiceNumber)}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
-<body style="font-family:system-ui,sans-serif;line-height:1.5;color:#111;max-width:880px;margin:24px auto;padding:0 16px">
-  <h1 style="font-size:22px;margin:0 0 8px">INVOICE</h1>
-  <p style="margin:0 0 20px;color:#444">${escapeHtml(d.vatNote)}</p>
-  <table style="border-collapse:collapse;width:100%;margin-bottom:20px">${tableRows}</table>
-  <h2 style="font-size:16px;margin:24px 0 8px">금액</h2>
-  <table style="border-collapse:collapse;width:100%;margin-bottom:24px">${moneyRows}</table>
-  <h2 style="font-size:16px;margin:24px 0 8px">결제 방법</h2>
-  <p style="margin:0 0 8px">${escapeHtml(d.paymentMethod)} — ${escapeHtml(d.bankName)} / ${escapeHtml(d.accountNumber)} / 예금주 ${escapeHtml(d.accountHolder)}</p>
-  <p style="margin:0 0 20px"><strong>이체 시 참조(메모):</strong> ${escapeHtml(d.reference)}</p>
-  <h2 style="font-size:16px;margin:24px 0 8px">K-LINK 담당자</h2>
-  <p style="margin:0">이름: ${escapeHtml(d.issuerName)}</p>
-  <p style="margin:0">이메일: ${escapeHtml(d.issuerEmail)}</p>
-  <p style="margin:0">연락처: ${escapeHtml(d.issuerPhone)}</p>
-</body>
-</html>`;
 }

@@ -1,8 +1,6 @@
-# 인보이스 PDF 폰트 (선택)
+# 폰트 안내
 
-`NotoSansKR-Regular.ttf` 파일을 이 폴더에 두면, Vercel 등에서 외부 네트워크 없이 한글 PDF를 생성할 수 있습니다.
+한글 인보이스 PDF용 **NotoSansKR-Regular.ttf** 는 저장소의 **`src/assets/fonts/NotoSansKR-Regular.ttf`** 에 포함됩니다.  
+(배포 시 API 번들에 함께 올라가도록 `next.config.ts`의 `outputFileTracingIncludes` 로 지정되어 있습니다.)
 
-- 다운로드: [Noto Sans KR (Google Fonts)](https://fonts.google.com/noto/specimen/Noto+Sans+KR) → Static → Regular TTF  
-- 파일명: `NotoSansKR-Regular.ttf` (정확히 이 이름)
-
-폰트가 없으면 서버가 CDN에서 받아 임시 폴더에 저장한 뒤 사용합니다.
+이 폴더에 동일 파일을 두어도 되며, 코드는 `src/assets` → `public/fonts` 순으로 찾습니다.

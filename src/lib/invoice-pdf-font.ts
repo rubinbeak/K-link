@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { existsSync } from "fs";
+import { existsSync, statSync } from "fs";
 import { mkdir, writeFile } from "fs/promises";
 import os from "os";
 import path from "path";
@@ -7,28 +7,42 @@ import { Font } from "@react-pdf/renderer";
 
 let registered = false;
 
-/** 로컬 파일 → (실패 시) 원격에서 받아 tmp 저장 후 경로로 등록 */
+/** Vercel 등에서 fetch가 막혀도 동작하도록 fonts.gstatic 우선 */
 const FONT_SOURCES: { url: string; ext: ".ttf" | ".woff2" }[] = [
+  {
+    url: "https://fonts.gstatic.com/s/notosanskr/v39/PbyxFmXiEBPT4ITbgNA5Cgms3VYcOA-vvnIzzuoyeLQ.ttf",
+    ext: ".ttf",
+  },
   {
     url: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosanskr/static/NotoSansKR-Regular.ttf",
     ext: ".ttf",
   },
-  {
-    url: "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanskr/static/NotoSansKR-Regular.ttf",
-    ext: ".ttf",
-  },
 ];
 
-function localFontPath(): string {
-  return path.join(process.cwd(), "public", "fonts", "NotoSansKR-Regular.ttf");
+const MIN_FONT_BYTES = 100_000;
+
+function resolveBundledFontPath(): string | null {
+  const candidates = [
+    path.join(process.cwd(), "src", "assets", "fonts", "NotoSansKR-Regular.ttf"),
+    path.join(process.cwd(), "public", "fonts", "NotoSansKR-Regular.ttf"),
+  ];
+  for (const p of candidates) {
+    if (!existsSync(p)) continue;
+    try {
+      if (statSync(p).size >= MIN_FONT_BYTES) return p;
+    } catch {
+      /* ignore */
+    }
+  }
+  return null;
 }
 
 export async function registerInvoiceKoreanFont(): Promise<void> {
   if (registered) return;
 
-  const local = localFontPath();
-  if (existsSync(local)) {
-    Font.register({ family: "NotoSansKR", src: local });
+  const bundled = resolveBundledFontPath();
+  if (bundled) {
+    Font.register({ family: "NotoSansKR", src: bundled });
     registered = true;
     return;
   }
@@ -43,7 +57,7 @@ export async function registerInvoiceKoreanFont(): Promise<void> {
         redirect: "follow",
         signal: AbortSignal.timeout(30_000),
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; K-LINK-Invoice/1.0)",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (compatible; K-LINK-Invoice/1.0)",
           Accept: "*/*",
         },
       });
@@ -52,7 +66,7 @@ export async function registerInvoiceKoreanFont(): Promise<void> {
         continue;
       }
       const buf = new Uint8Array(await res.arrayBuffer());
-      if (buf.byteLength < 20_000) {
+      if (buf.byteLength < MIN_FONT_BYTES) {
         lastErr = new Error(`font too small (${buf.byteLength}) ${url}`);
         continue;
       }

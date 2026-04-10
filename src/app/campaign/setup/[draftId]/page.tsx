@@ -6,8 +6,6 @@ import { CampaignSetupFunnelForm } from "@/components/campaign/campaign-setup-fu
 import { CampaignSetupWizard, type CampaignDraftData } from "@/components/campaign/campaign-setup-wizard";
 import { isFunnelDraftData } from "@/lib/funnel-campaign-finalize";
 import { userToBrandContactStep1 } from "@/lib/brand-profile";
-import { getCampaignSubmitInstructions } from "@/lib/campaign-submit-instructions";
-
 export default async function CampaignSetupEditPage({ params }: { params: Promise<{ draftId: string }> }) {
   const { draftId } = await params;
   const session = await auth();
@@ -31,7 +29,6 @@ export default async function CampaignSetupEditPage({ params }: { params: Promis
   );
 
   const useFunnel = isFunnelDraftData(draft.data);
-  const submitInstructions = getCampaignSubmitInstructions();
 
   return (
     <div className="relative min-h-dvh overflow-hidden">
@@ -49,7 +46,6 @@ export default async function CampaignSetupEditPage({ params }: { params: Promis
             initialDraftData={draft.data}
             initialStep={draft.currentStep}
             initialBrandProfile={initialBrandProfile}
-            submitInstructions={submitInstructions}
           />
         ) : (
           <CampaignSetupWizard initialDraftId={draft.id} initialData={draft.data as Partial<CampaignDraftData>} />

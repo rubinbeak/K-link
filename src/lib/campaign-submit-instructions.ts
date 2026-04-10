@@ -22,9 +22,9 @@ const DEFAULT_TAX_INVOICE =
  */
 export function getCampaignSubmitInstructions(): CampaignSubmitInstructions {
   return {
-    bankName: process.env.BANK_NAME ?? "국민은행",
-    accountNumber: process.env.BANK_ACCOUNT_NUMBER ?? "000000-00-000000",
-    accountHolder: process.env.BANK_ACCOUNT_HOLDER ?? "K-LINK",
+    bankName: process.env.BANK_NAME ?? "IBK 기업은행",
+    accountNumber: process.env.BANK_ACCOUNT_NUMBER ?? "289-127559-04-029",
+    accountHolder: process.env.BANK_ACCOUNT_HOLDER ?? "백은진",
     referenceNote:
       process.env.CAMPAIGN_SUBMIT_REFERENCE_NOTE?.trim() ||
       "제출이 완료되면 열리는 인보이스 화면에서 참조코드(Reference)를 확인하실 수 있습니다. 입금 시 이체 메모 또는 입금자명에 해당 코드를 함께 기재해 주세요.",

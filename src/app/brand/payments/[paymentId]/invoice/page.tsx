@@ -40,11 +40,17 @@ export default async function BrandInvoicePage({ params }: { params: Promise<{ p
             재무팀 기안용으로 바로 전달할 수 있도록 결제 정보를 정리했습니다.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/campaign/setup/complete/${paymentId}`}
+            className={cn(buttonVariants({ size: "sm", className: "bg-[#ff2f9b] text-white hover:bg-[#e61c8d]" }))}
+          >
+            결제·인보이스 안내(전체)
+          </Link>
           <Link href="/brand" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
             마이페이지
           </Link>
-          <Link href="/campaign/setup" className={cn(buttonVariants({ size: "sm" }))}>
+          <Link href="/campaign/setup" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
             새 캠페인 세팅
           </Link>
         </div>

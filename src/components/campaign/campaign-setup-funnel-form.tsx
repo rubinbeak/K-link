@@ -14,8 +14,7 @@ import { benefitLabel, BENEFIT_VALUES, platformLabel, PLATFORM_VALUES, regionLab
 import { useCampaignFormAutosave } from "@/components/campaign/use-campaign-form-autosave";
 import { isFunnelDraftData, type FunnelDraftPayload } from "@/lib/funnel-campaign-finalize";
 import { mergeBrandProfileIntoStep1, type BrandContactStep1 } from "@/lib/brand-profile";
-import { CampaignSubmitInstructionsModal } from "@/components/campaign/campaign-submit-instructions-modal";
-import type { CampaignSubmitInstructions } from "@/lib/campaign-submit-instructions";
+import { openCampaignSetupCompleteInNewTab } from "@/lib/campaign-post-submit";
 
 const PLACE_OPTIONS = [
   { value: "BEAUTY_STORE", label: "뷰티 매장" },
@@ -218,13 +217,11 @@ export function CampaignSetupFunnelForm({
   initialDraftData,
   initialStep,
   initialBrandProfile,
-  submitInstructions,
 }: {
   initialDraftId?: string;
   initialDraftData?: unknown;
   initialStep?: number;
   initialBrandProfile?: BrandContactStep1;
-  submitInstructions: CampaignSubmitInstructions;
 }) {
   const router = useRouter();
   const [step, setStep] = useState(() =>
@@ -243,7 +240,7 @@ export function CampaignSetupFunnelForm({
   const [savedAtServer, setSavedAtServer] = useState("");
   const [serverError, setServerError] = useState("");
   const [finalizing, setFinalizing] = useState(false);
-  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [submitSuccessMessage, setSubmitSuccessMessage] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isClinic = formData.step1.placeType === "CLINIC";
@@ -387,8 +384,12 @@ export function CampaignSetupFunnelForm({
         setServerError(typeof json.error === "string" ? json.error : "캠페인 생성 실패");
         return;
       }
-      setSubmitModalOpen(false);
-      if (json.paymentId) router.push(`/brand/payments/${json.paymentId}/invoice`);
+      if (json.paymentId) {
+        openCampaignSetupCompleteInNewTab(json.paymentId);
+        setSubmitSuccessMessage(
+          "캠페인 세팅이 완료되었습니다. 새 창에서 결제·인보이스 안내를 확인해 주세요. 창이 뜨지 않으면 팝업 차단을 해제해 주세요.",
+        );
+      }
     } finally {
       setFinalizing(false);
     }
@@ -541,6 +542,11 @@ export function CampaignSetupFunnelForm({
                     ))}
                   </div>
                 </div>
+                {submitSuccessMessage ? (
+                  <p className="rounded-lg border border-emerald-200 bg-emerald-50/90 px-3 py-2 text-sm text-emerald-800" role="status">
+                    {submitSuccessMessage}
+                  </p>
+                ) : null}
                 {serverError ? (
                   <p className="text-sm text-destructive" role="alert">
                     {serverError}
@@ -1147,7 +1153,7 @@ export function CampaignSetupFunnelForm({
                         type="button"
                         size="lg"
                         disabled={finalizing || savingServer}
-                        onClick={() => setSubmitModalOpen(true)}
+                        onClick={() => void finalizeCampaign()}
                         className="gap-2 bg-[#ff2f9b] text-white hover:bg-[#e61c8d]"
                       >
                         {finalizing ? "제출 중…" : "제출하기"}
@@ -1193,7 +1199,7 @@ export function CampaignSetupFunnelForm({
                 <p className="text-xs text-zinc-500">총 인원: {pricingSummary.headcount}명</p>
                 <p className="text-xs text-zinc-500">* 최종 금액은 인원/국가/일정 확정 후 안내됩니다.</p>
                 <p className="text-xs text-zinc-500">
-                  제출하기를 누르면 입금 안내를 확인한 뒤 캠페인을 확정하고, 이어서 인보이스(무통장) 페이지로 이동합니다.
+                  제출하기를 누르면 캠페인이 확정되며, 새 창에서 요약·결제 절차·인보이스·입금 계좌를 한 번에 확인할 수 있습니다.
                 </p>
               </CardContent>
             </Card>
@@ -1245,13 +1251,6 @@ export function CampaignSetupFunnelForm({
         </div>
       ) : null}
 
-      <CampaignSubmitInstructionsModal
-        open={submitModalOpen}
-        onOpenChange={setSubmitModalOpen}
-        instructions={submitInstructions}
-        onConfirm={() => void finalizeCampaign()}
-        busy={finalizing || savingServer}
-      />
     </div>
   );
 }

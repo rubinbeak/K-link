@@ -461,8 +461,7 @@ export function ConsultingForm({
 
       {requestSaved ? (
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5 text-sm text-zinc-700">
-          <p className="font-semibold text-zinc-900">입력 내용이 준비되었습니다.</p>
-          <p className="mt-1 text-zinc-600">아래 요약을 확인하고 운영팀 전달 방식(API 연동)으로 바로 확장할 수 있습니다.</p>
+          <p className="font-semibold text-zinc-900">상담 신청이 접수되었습니다.</p>
           <ul className="mt-3 space-y-1.5 text-zinc-700">
             <li>유형: {summary.campaignTypes.join(", ")}</li>
             <li>주요 목표: {summary.goals.join(", ")}</li>

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { openCampaignSetupCompleteInNewTab } from "@/lib/campaign-post-submit";
 import {
   BENEFIT_VALUES,
   benefitLabel,
@@ -197,7 +198,7 @@ export function CampaignSetupWizard({
       return;
     }
     if (json?.paymentId) {
-      router.push(`/brand/payments/${json.paymentId}/invoice`);
+      openCampaignSetupCompleteInNewTab(json.paymentId);
       return;
     }
     router.push("/brand");

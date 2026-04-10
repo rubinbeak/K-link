@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ export function BrandBasicInfoSection({
   initialProfile: BrandContactStep1;
   className?: string;
 }) {
+  const { update: updateSession } = useSession();
   const [profile, setProfile] = useState<BrandContactStep1>(initialProfile);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
@@ -39,6 +41,7 @@ export function BrandBasicInfoSection({
         return;
       }
       if (data.profile) setProfile(data.profile);
+      await updateSession();
       setMessage({ type: "ok", text: "저장되었습니다. 캠페인 세팅·상담 화면에도 동일하게 반영됩니다." });
     } catch {
       setMessage({ type: "err", text: "네트워크 오류로 저장하지 못했습니다." });

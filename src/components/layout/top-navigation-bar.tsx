@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 const centerMenu = [
   { label: "서비스 설명", href: "/services/visit-content", match: "/services/visit-content" },
-  { label: "캠페인 세팅", href: "/campaign/setup", match: "/campaign/setup" },
+  { label: "캠페인 세팅하기", href: "/campaign/setup", match: "/campaign/setup" },
   { label: "캠페인 상담하기", href: "/consulting", match: "/consulting" },
 ] as const;
 
@@ -61,7 +61,11 @@ export function TopNavigationBar() {
   const isAuthenticated = status === "authenticated";
   const userRole = session?.user?.role;
   const myPageHref = homeForRole(userRole);
-  const displayName = session?.user?.name || session?.user?.email || "내 계정";
+  const brandLabel = session?.user?.brandName?.trim();
+  const displayName =
+    userRole === "BRAND" && brandLabel
+      ? brandLabel
+      : session?.user?.name || session?.user?.email || "내 계정";
 
   const hideForHeroIntro = pathname === "/for-brands" && !introPassed;
 
@@ -75,22 +79,27 @@ export function TopNavigationBar() {
           : "max-h-24 translate-y-0 opacity-100",
       )}
     >
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-        <Link
-          href="/for-brands"
-          className="relative flex h-10 shrink-0 items-center py-0.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
-        >
-          <Image
-            src="/images/k-link-logo.png"
-            alt="K-LINK Logo"
-            width={64}
-            height={64}
-            className="h-9 w-auto object-contain object-left sm:h-10"
-            priority
-          />
-        </Link>
+      <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-4 sm:px-6">
+        <div className="flex min-w-0 flex-1 justify-start">
+          <Link
+            href="/for-brands"
+            className="relative flex h-10 shrink-0 items-center py-0.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
+          >
+            <Image
+              src="/images/k-link-logo.png"
+              alt="K-LINK Logo"
+              width={64}
+              height={64}
+              className="h-9 w-auto object-contain object-left sm:h-10"
+              priority
+            />
+          </Link>
+        </div>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="메인 퍼널 메뉴">
+        <nav
+          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 md:flex"
+          aria-label="메인 퍼널 메뉴"
+        >
           {centerMenu.map((item) => {
             const active = isActivePath(pathname, item.match);
             return (
@@ -115,15 +124,16 @@ export function TopNavigationBar() {
           })}
         </nav>
 
-        <div className="hidden items-center md:flex">
-          {isAuthenticated ? (
+        <div className="flex min-w-0 flex-1 justify-end">
+          <div className="hidden items-center md:flex">
+            {isAuthenticated ? (
             <div className="flex items-center gap-2">
               <span className="max-w-[180px] truncate text-xs text-zinc-600">{displayName}</span>
               <Link
                 href={myPageHref}
                 className="rounded-full border border-primary/45 bg-primary/8 px-3.5 py-1.5 text-sm font-semibold text-primary transition hover:bg-primary/12"
               >
-                내 마이페이지
+                마이페이지
               </Link>
               <button
                 type="button"
@@ -145,7 +155,8 @@ export function TopNavigationBar() {
             >
               로그인/회원가입
             </Link>
-          )}
+            )}
+          </div>
         </div>
 
         <button
@@ -162,7 +173,7 @@ export function TopNavigationBar() {
 
       {open ? (
         <div id="mobile-top-nav" className="border-t border-zinc-200/70 bg-white/95 px-4 pb-4 pt-3 backdrop-blur md:hidden">
-          <nav className="space-y-1" aria-label="모바일 퍼널 메뉴">
+          <nav className="space-y-1 text-center" aria-label="모바일 퍼널 메뉴">
             {centerMenu.map((item) => {
               const active = isActivePath(pathname, item.match);
               return (
@@ -184,7 +195,7 @@ export function TopNavigationBar() {
                   href={myPageHref}
                   className="mt-2 block rounded-lg border border-primary/45 bg-primary/8 px-3 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/12"
                 >
-                  내 마이페이지
+                  마이페이지
                 </Link>
                 <button
                   type="button"

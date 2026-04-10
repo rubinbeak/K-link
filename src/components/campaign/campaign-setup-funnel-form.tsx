@@ -147,6 +147,56 @@ function toggleArrayItem(arr: string[], value: string) {
   return arr.includes(value) ? arr.filter((x) => x !== value) : [...arr, value];
 }
 
+/** 숫자만 허용 · 포커스 중에는 문자열 draft로 두어 키보드 입력이 끊기지 않게 함 */
+const FOLLOWER_HEADCOUNT_INPUT_MAX = 9999;
+
+function FollowerHeadcountInput({
+  id,
+  "aria-label": ariaLabel,
+  value,
+  onCommit,
+  className,
+}: {
+  id: string;
+  "aria-label": string;
+  value: number;
+  onCommit: (n: number) => void;
+  className?: string;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const safe = Math.max(0, Math.min(FOLLOWER_HEADCOUNT_INPUT_MAX, Math.floor(Number.isFinite(value) ? value : 0)));
+  const display = draft !== null ? draft : String(safe);
+
+  return (
+    <Input
+      id={id}
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      autoComplete="off"
+      aria-label={ariaLabel}
+      className={className}
+      value={display}
+      onFocus={() => setDraft(String(safe))}
+      onChange={(e) => {
+        const digits = e.target.value.replace(/\D/g, "").slice(0, 4);
+        setDraft(digits);
+        if (digits === "") {
+          onCommit(0);
+          return;
+        }
+        const parsed = Number.parseInt(digits, 10);
+        if (!Number.isFinite(parsed)) {
+          onCommit(0);
+          return;
+        }
+        onCommit(Math.min(FOLLOWER_HEADCOUNT_INPUT_MAX, Math.max(0, parsed)));
+      }}
+      onBlur={() => setDraft(null)}
+    />
+  );
+}
+
 function mergeServerDraftIntoForm(defaults: CampaignSetupFormData, raw: unknown): CampaignSetupFormData {
   if (!isFunnelDraftData(raw)) return defaults;
   const d = raw as Partial<FunnelDraftPayload> & Pick<FunnelDraftPayload, "step1">;
@@ -991,15 +1041,15 @@ export function CampaignSetupFunnelForm({
                           <div className="rounded-lg border border-zinc-200 bg-white p-3">
                             <p className="text-sm font-semibold text-zinc-800">5000 미만</p>
                             <p className="mt-0.5 text-xs text-zinc-500">1인 {UNIT_PRICE_UNDER_5K.toLocaleString()}원</p>
-                            <Input
-                              type="number"
-                              min={0}
+                            <FollowerHeadcountInput
+                              id="follower-count-under-5k"
+                              aria-label="팔로워 5000 미만 구간 인플루언서 수"
                               className="mt-2"
                               value={formData.step3.followerCountUnder5k}
-                              onChange={(e) =>
+                              onCommit={(n) =>
                                 setFormData((prev) => ({
                                   ...prev,
-                                  step3: { ...prev.step3, followerCountUnder5k: Math.max(0, Number(e.target.value || 0)) },
+                                  step3: { ...prev.step3, followerCountUnder5k: n },
                                 }))
                               }
                             />
@@ -1007,15 +1057,15 @@ export function CampaignSetupFunnelForm({
                           <div className="rounded-lg border border-fuchsia-200 bg-fuchsia-50/55 p-3">
                             <p className="text-sm font-semibold text-zinc-800">5000 이상</p>
                             <p className="mt-0.5 text-xs text-fuchsia-700">1인 {UNIT_PRICE_OVER_5K.toLocaleString()}원</p>
-                            <Input
-                              type="number"
-                              min={0}
+                            <FollowerHeadcountInput
+                              id="follower-count-over-5k"
+                              aria-label="팔로워 5000 이상 구간 인플루언서 수"
                               className="mt-2 border-fuchsia-200 bg-white"
                               value={formData.step3.followerCountOver5k}
-                              onChange={(e) =>
+                              onCommit={(n) =>
                                 setFormData((prev) => ({
                                   ...prev,
-                                  step3: { ...prev.step3, followerCountOver5k: Math.max(0, Number(e.target.value || 0)) },
+                                  step3: { ...prev.step3, followerCountOver5k: n },
                                 }))
                               }
                             />

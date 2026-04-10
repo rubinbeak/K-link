@@ -63,7 +63,6 @@ export function ConsultingForm({
   const [eventStartDate, setEventStartDate] = useState("")
   const [eventEndDate, setEventEndDate] = useState("")
   const [errors, setErrors] = useState<FormErrors>({})
-  const [submitted, setSubmitted] = useState(false)
   const [requestSaving, setRequestSaving] = useState(false)
   const [requestSaved, setRequestSaved] = useState(false)
   const [showThanksBanner, setShowThanksBanner] = useState(false)
@@ -109,23 +108,20 @@ export function ConsultingForm({
     return Object.keys(nextErrors).length === 0
   }
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setSubmitted(false)
-    if (!validate()) return
-    setSubmitted(true)
-    setRequestSaved(false)
-    setShowThanksBanner(false)
-  }
-
   async function submitConsultingRequest() {
-    if (!submitted || requestSaving || requestSaved) return
+    if (requestSaving || requestSaved) return
+    setSubmitError("")
+
     const form = formRef.current
     if (!form) return
+    if (!form.checkValidity()) {
+      form.reportValidity()
+      return
+    }
+    if (!validate()) return
 
     setRequestSaving(true)
     setShowThanksBanner(false)
-    setSubmitError("")
 
     const fd = new FormData(form)
     const brandName = String(fd.get("brandName") ?? "").trim()
@@ -181,7 +177,13 @@ export function ConsultingForm({
   }
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} className="space-y-7 sm:space-y-8">
+    <form
+      ref={formRef}
+      onSubmit={(e) => {
+        e.preventDefault()
+      }}
+      className="space-y-7 sm:space-y-8"
+    >
       <section className="rounded-2xl border border-white/60 bg-zinc-50/70 p-5 sm:p-6">
         <div className="mb-4">
           <p className="text-[11px] font-semibold tracking-widest text-primary">1. 기본 정보</p>
@@ -432,18 +434,14 @@ export function ConsultingForm({
       </section>
 
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <Button type="submit" size="lg">
-          내용 확인하기
-        </Button>
         <Button
           type="button"
           size="lg"
-          variant={submitted ? "default" : "outline"}
-          disabled={!submitted || requestSaving || requestSaved}
-          onClick={submitConsultingRequest}
-          className={cn(submitted ? "shadow-[0_0_0_4px_rgba(224,72,153,0.18)]" : "")}
+          disabled={requestSaving || requestSaved}
+          onClick={() => void submitConsultingRequest()}
+          className={cn("min-w-[200px] shadow-[0_0_0_4px_rgba(224,72,153,0.12)] sm:min-w-[240px]")}
         >
-          {requestSaving ? "제출 중..." : requestSaved ? "제출 완료" : "제출하기"}
+          {requestSaving ? "신청 중..." : requestSaved ? "신청 완료" : "상담 신청하기"}
         </Button>
       </div>
 
@@ -461,7 +459,7 @@ export function ConsultingForm({
         </div>
       ) : null}
 
-      {submitted ? (
+      {requestSaved ? (
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5 text-sm text-zinc-700">
           <p className="font-semibold text-zinc-900">입력 내용이 준비되었습니다.</p>
           <p className="mt-1 text-zinc-600">아래 요약을 확인하고 운영팀 전달 방식(API 연동)으로 바로 확장할 수 있습니다.</p>

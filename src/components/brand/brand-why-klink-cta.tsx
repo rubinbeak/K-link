@@ -86,11 +86,11 @@ export function BrandWhyKlinkCta() {
           <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-14">
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold tracking-[0.14em] text-zinc-500">협력 가능 업종</p>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 grid grid-cols-3 gap-2">
                 {industries.map((label) => (
                   <span
                     key={label}
-                    className="inline-flex items-center rounded-full border border-fuchsia-200/50 bg-white/40 px-3 py-1.5 text-xs font-medium text-zinc-800 backdrop-blur-[2px] sm:text-sm"
+                    className="inline-flex min-w-0 items-center justify-center rounded-full border border-fuchsia-200/50 bg-white/40 px-2 py-1.5 text-center text-xs font-medium leading-snug text-zinc-800 backdrop-blur-[2px] sm:px-3 sm:text-sm sm:leading-normal"
                   >
                     {label}
                   </span>

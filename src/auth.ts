@@ -27,7 +27,7 @@ const providers = [
 
       const user = await prisma.user.findUnique({
         where: { email },
-        select: { id: true, email: true, name: true, role: true, password: true },
+        select: { id: true, email: true, name: true, role: true, brandName: true, password: true },
       });
       if (!user?.password) return null;
 
@@ -39,6 +39,7 @@ const providers = [
         email: user.email,
         name: user.name,
         role: user.role,
+        brandName: user.brandName,
       };
     },
   }),
@@ -73,13 +74,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       const dbUser = await prisma.user.findUnique({
         where: { email },
-        select: { id: true, email: true, name: true, role: true },
+        select: { id: true, email: true, name: true, role: true, brandName: true },
       });
       if (dbUser) {
         token.id = dbUser.id;
         token.role = dbUser.role;
         token.email = dbUser.email;
         if (dbUser.name) token.name = dbUser.name;
+        token.brandName = dbUser.brandName ?? null;
       }
       return token;
     },
@@ -87,6 +89,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as typeof session.user.role;
+        session.user.brandName = (token.brandName as string | null | undefined) ?? null;
       }
       return session;
     },

@@ -1,7 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
-const BRAND_ONLY_PUBLIC_LANDING = "/for-brands";
+const BRAND_ONLY_PUBLIC_LANDING = "/";
 const BRAND_AUTH_REQUIRED_PREFIXES = ["/campaign/setup", "/consulting"] as const;
 
 /** Auth.js uses `__Secure-` session cookies when the sign-in URL is HTTPS; getToken must use the same flag. */

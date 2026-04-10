@@ -22,7 +22,7 @@ export function PortalHeader({
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
         <div className="flex items-center justify-between gap-4">
-          <Link href="/for-brands" className="font-semibold tracking-tight text-foreground">
+          <Link href="/" className="font-semibold tracking-tight text-foreground">
             <span className="text-primary">K-LINK</span>
             <span className="text-muted-foreground"> · {title}</span>
           </Link>

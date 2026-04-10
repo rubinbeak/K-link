@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 
-/** /for-brands 풀스크린 히어로 핀·슬라이드가 끝난 뒤에만 띄움. 값은 BrandImpactHero FULLSCREEN_SCROLL_EXTRA_MIN_VH와 맞출 것. */
+/** 루트(/) 브랜드 랜딩 풀스크린 히어로 핀·슬라이드가 끝난 뒤에만 띄움. 값은 BrandImpactHero FULLSCREEN_SCROLL_EXTRA_MIN_VH와 맞출 것. */
 const FOR_BRANDS_FLOAT_REVEAL_VH_MULT = 2.35;
 
 export function BrandFloatingSetupCta({ label }: { label: string }) {
@@ -18,7 +18,7 @@ export function BrandFloatingSetupCta({ label }: { label: string }) {
     const onScroll = () => {
       const h = window.innerHeight || 1;
       const threshold =
-        pathname === "/for-brands" ? h * FOR_BRANDS_FLOAT_REVEAL_VH_MULT : h * 0.78;
+        pathname === "/" || pathname === "/for-brands" ? h * FOR_BRANDS_FLOAT_REVEAL_VH_MULT : h * 0.78;
       setVisible(window.scrollY > threshold);
     };
     onScroll();

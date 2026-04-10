@@ -16,7 +16,7 @@ export default async function SignupPage({ searchParams }: { searchParams?: Prom
       </div>
       <div className="relative mx-auto flex min-h-dvh w-full max-w-[760px] flex-col justify-center px-5 py-12 sm:px-8">
         <div className="mb-8 flex flex-col items-center gap-2 text-center text-sm">
-          <Link href="/for-brands" className="font-medium text-muted-foreground hover:text-foreground">
+          <Link href="/" className="font-medium text-muted-foreground hover:text-foreground">
             ← 브랜드 메인으로
           </Link>
           <p className="text-xs text-muted-foreground">브랜드 전용 VISIT 콘텐츠 캠페인 운영 계정 생성</p>

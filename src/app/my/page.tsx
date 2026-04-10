@@ -43,7 +43,7 @@ export default async function MyPage() {
               <Link href="/login?callbackUrl=/my" className={cn(buttonVariants({ size: "lg" }))}>
                 로그인/회원가입
               </Link>
-              <Link href="/for-brands" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
+              <Link href="/" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
                 브랜드 소개로 이동
               </Link>
             </div>
@@ -116,7 +116,7 @@ export default async function MyPage() {
 
             {!user.role ? (
               <div className="mt-6">
-                <Link href="/for-brands" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
+                <Link href="/" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
                   브랜드 안내 페이지
                 </Link>
               </div>

@@ -37,7 +37,7 @@ export default async function CampaignSetupEditPage({ params }: { params: Promis
         <div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-fuchsia-300/20 blur-3xl" />
       </div>
       <main className="relative mx-auto max-w-6xl px-4 py-10">
-        <Link href="/for-brands" className="mb-6 inline-block text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/" className="mb-6 inline-block text-sm text-muted-foreground hover:text-foreground">
           ← 브랜드 페이지
         </Link>
         {useFunnel ? (

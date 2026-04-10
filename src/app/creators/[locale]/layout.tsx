@@ -75,7 +75,7 @@ export default async function CreatorsLocaleLayout({
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2 lg:justify-self-end">
             <Link
-              href="/for-brands"
+              href="/"
               className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-muted-foreground")}
             >
               {t.nav.brandSite}

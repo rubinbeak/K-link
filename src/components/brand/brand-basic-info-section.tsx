@@ -104,12 +104,14 @@ export function BrandBasicInfoSection({
             />
           </div>
         </div>
-        <div className="mt-5 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-col items-center gap-2">
           <Button type="button" onClick={() => void onSave()} disabled={saving}>
             {saving ? "저장 중..." : "기본 정보 저장"}
           </Button>
           {message ? (
-            <p className={cn("text-sm", message.type === "ok" ? "text-emerald-700" : "text-destructive")}>{message.text}</p>
+            <p className={cn("max-w-md text-center text-sm", message.type === "ok" ? "text-emerald-700" : "text-destructive")}>
+              {message.text}
+            </p>
           ) : null}
         </div>
       </div>

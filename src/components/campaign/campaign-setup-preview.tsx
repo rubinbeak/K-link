@@ -61,7 +61,7 @@ export function CampaignSetupPreview() {
 
       <main className="relative mx-auto max-w-3xl px-4 py-10 pb-24 lg:max-w-4xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <Link href="/for-brands" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← 브랜드 안내
           </Link>
           <div className="flex flex-wrap gap-2">
@@ -257,7 +257,7 @@ export function CampaignSetupPreview() {
           >
             회원가입하고 실제 세팅 시작
           </Link>
-          <Link href="/for-brands" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
+          <Link href="/" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
             브랜드 안내로 돌아가기
           </Link>
         </div>

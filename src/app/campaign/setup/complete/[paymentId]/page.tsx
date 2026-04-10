@@ -27,7 +27,7 @@ function SummaryTable({ rows }: { rows: { label: string; value: string }[] }) {
                 {label}
               </th>
               <td className="px-4 py-3 align-top text-zinc-900 sm:px-5">
-                <span className="break-words leading-relaxed">{value}</span>
+                <span className="wrap-break-word leading-relaxed">{value}</span>
               </td>
             </tr>
           ))}
@@ -161,7 +161,7 @@ export default async function CampaignSetupCompletePage({ params }: { params: Pr
       </div>
 
       <main className="relative mx-auto max-w-4xl px-4 py-10">
-        <Link href="/for-brands" className="mb-6 inline-block text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/" className="mb-6 inline-block text-sm text-muted-foreground hover:text-foreground">
           ← 브랜드 페이지
         </Link>
 

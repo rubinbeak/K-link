@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-6">
           <Link
-            href="/for-brands"
+            href="/"
             className="inline-flex shrink-0 items-center self-start rounded-md outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
           >
             <Image

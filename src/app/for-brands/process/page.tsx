@@ -46,12 +46,12 @@ export default function BrandProcessPage() {
 
       <header className="sticky top-0 z-20 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="brand-container flex flex-wrap items-center justify-between gap-3 py-4">
-          <Link href="/for-brands" className="text-lg font-semibold tracking-tight">
+          <Link href="/" className="text-lg font-semibold tracking-tight">
             <span className="text-primary">K-LINK</span>
             <span className="text-muted-foreground"> · 브랜드</span>
           </Link>
           <div className="flex flex-wrap items-center gap-2">
-            <Link href="/for-brands" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-muted-foreground")}>
+            <Link href="/" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-muted-foreground")}>
               메인홈
             </Link>
             <Link href="/services/visit-content" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-muted-foreground")}>
@@ -82,7 +82,7 @@ export default function BrandProcessPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Link href="/for-brands" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+            <Link href="/" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
               메인페이지
             </Link>
             <Link href="/campaign/setup" className={cn(buttonVariants({ size: "sm" }))}>

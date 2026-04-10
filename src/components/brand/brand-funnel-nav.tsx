@@ -26,7 +26,7 @@ export function BrandFunnelNav({ sessionUser }: { sessionUser: SessionUser }) {
     <header className="sticky top-0 z-40 border-b border-zinc-200/90 bg-white/90 backdrop-blur-xl supports-backdrop-filter:bg-white/70">
       <div className="brand-container py-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link href="/for-brands" className="text-lg font-semibold tracking-tight">
+          <Link href="/" className="text-lg font-semibold tracking-tight">
             <span className="text-primary">K-LINK</span>
             <span className="text-muted-foreground"> · 브랜드 퍼널</span>
           </Link>

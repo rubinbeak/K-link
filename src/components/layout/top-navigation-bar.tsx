@@ -42,7 +42,7 @@ export function TopNavigationBar() {
     const handleScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 8);
-      if (pathname === "/for-brands") {
+      if (pathname === "/" || pathname === "/for-brands") {
         setIntroPassed(y > window.innerHeight * 0.55);
       } else {
         setIntroPassed(true);
@@ -67,7 +67,7 @@ export function TopNavigationBar() {
       ? brandLabel
       : session?.user?.name || session?.user?.email || "내 계정";
 
-  const hideForHeroIntro = pathname === "/for-brands" && !introPassed;
+  const hideForHeroIntro = (pathname === "/" || pathname === "/for-brands") && !introPassed;
 
   return (
     <header
@@ -82,7 +82,7 @@ export function TopNavigationBar() {
       <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-4 sm:px-6">
         <div className="flex min-w-0 flex-1 justify-start">
           <Link
-            href="/for-brands"
+            href="/"
             className="relative flex h-10 shrink-0 items-center py-0.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
           >
             <Image
@@ -137,7 +137,7 @@ export function TopNavigationBar() {
               </Link>
               <button
                 type="button"
-                onClick={() => signOut({ callbackUrl: "/for-brands" })}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="rounded-full border border-zinc-300 bg-white px-3.5 py-1.5 text-sm font-semibold text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-900"
               >
                 로그아웃
@@ -199,7 +199,7 @@ export function TopNavigationBar() {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => signOut({ callbackUrl: "/for-brands" })}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                   className="mt-2 block w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-left text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100"
                 >
                   로그아웃

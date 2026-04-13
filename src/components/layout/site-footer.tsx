@@ -5,7 +5,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-zinc-200/60 bg-zinc-50/50">
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-6">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
           <Link
             href="/"
             className="inline-flex shrink-0 items-center self-start rounded-md outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
@@ -19,25 +19,41 @@ export function SiteFooter() {
             />
           </Link>
 
-          <address className="min-w-0 flex-1 not-italic">
+          <address className="grid min-w-0 flex-1 grid-cols-1 gap-6 not-italic sm:grid-cols-2 xl:grid-cols-3 xl:gap-x-12 xl:gap-y-4">
             <ul className="space-y-0.5 text-[11px] leading-relaxed text-zinc-500 sm:text-xs sm:leading-relaxed">
               <li>
                 <span className="text-zinc-600">상호</span> 케이링크(K-LINK)
               </li>
               <li>
-                <span className="text-zinc-600">성명</span> 백은진
+                <span className="text-zinc-600">대표이사</span> 백은진
               </li>
               <li>
-                <span className="text-zinc-600">사업자번호</span> 157-13-02279
+                <span className="text-zinc-600">사업자등록번호</span> 157-13-02279
+              </li>
+            </ul>
+            <ul className="space-y-0.5 text-[11px] leading-relaxed text-zinc-500 sm:text-xs sm:leading-relaxed">
+              <li>
+                <span className="text-zinc-600">사업장주소</span> 경기도 파주시 장명산길 109(오도동)
               </li>
               <li>
-                <span className="text-zinc-600">주소</span> 경기도 파주시 장명산길 109(오도동)
+                <span className="text-zinc-600">서울지사</span> 서울특별시 영등포구 양평로 21길 25, 5층 504호
+              </li>
+            </ul>
+            <ul className="space-y-0.5 text-[11px] leading-relaxed text-zinc-500 sm:text-xs sm:leading-relaxed">
+              <li>
+                <span className="text-zinc-600">이메일</span>{" "}
+                <a
+                  href="mailto:contact@klink-global.com"
+                  className="text-zinc-600 underline-offset-2 hover:text-zinc-800 hover:underline"
+                >
+                  contact@klink-global.com
+                </a>
               </li>
             </ul>
           </address>
         </div>
 
-        <p className="mt-3 text-[10px] leading-normal tracking-wide text-zinc-400">
+        <p className="mt-4 text-center text-[10px] leading-normal tracking-wide text-zinc-400 lg:text-left">
           © {new Date().getFullYear()} 케이링크(K-LINK)
         </p>
       </div>

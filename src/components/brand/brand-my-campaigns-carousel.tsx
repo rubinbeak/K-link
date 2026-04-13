@@ -17,44 +17,33 @@ import {
   campaignTypeLabel,
   paymentStatusLabel,
 } from "@/lib/brand-ui-labels";
-import type {
-  ApplicationStatus,
-  CampaignLifecycleStatus,
-  CampaignStatus,
-  CampaignType,
-  PaymentStatus,
-} from "@/generated/prisma";
+import type { BrandMyCampaignItem } from "@/lib/brand-my-campaign-item";
 
-export type BrandMyCampaignItem = {
-  id: string;
-  title: string;
-  description: string;
-  lifecycle: CampaignLifecycleStatus;
-  status: CampaignStatus;
-  campaignType: CampaignType | null;
-  createdAtLabel: string;
-  budget: number;
-  visitLine: string | null;
-  visitAddress: string | null;
-  payment: { id: string; status: PaymentStatus; amount: number } | null;
-  applications: Array<{
-    id: string;
-    status: ApplicationStatus;
-    contentUrl: string | null;
-    influencer: { name: string | null; email: string; bio: string | null };
-  }>;
-};
+export type { BrandMyCampaignItem };
 
-function CampaignSlideCard({ c }: { c: BrandMyCampaignItem }) {
+function CampaignSlideCard({ c, compact }: { c: BrandMyCampaignItem; compact?: boolean }) {
   const payment = c.payment;
+  const maxDesc = compact ? 100 : 160;
   const desc =
-    c.description.length > 160 ? `${c.description.slice(0, 160)}…` : c.description;
+    c.description.length > maxDesc ? `${c.description.slice(0, maxDesc)}…` : c.description;
 
   return (
-    <Card className="mx-auto flex w-full max-w-xl flex-col overflow-hidden border-border/60 shadow-md">
-      <CardHeader className="space-y-4 pb-4 text-center">
+    <Card
+      className={cn(
+        "mx-auto flex w-full flex-col overflow-hidden border-border/60 shadow-md",
+        compact ? "max-w-md border-zinc-200/90 shadow-sm" : "max-w-xl",
+      )}
+    >
+      <CardHeader className={cn("pb-4 text-center", compact ? "space-y-3 p-5" : "space-y-4")}>
         <div className="space-y-3">
-          <CardTitle className="font-heading text-xl leading-snug sm:text-2xl">{c.title}</CardTitle>
+          <CardTitle
+            className={cn(
+              "font-heading leading-snug",
+              compact ? "text-lg sm:text-xl" : "text-xl sm:text-2xl",
+            )}
+          >
+            {c.title}
+          </CardTitle>
           <div className="flex flex-wrap items-center justify-center gap-2">
             <Badge className={campaignLifecycleClass(c.lifecycle)} variant="secondary">
               {campaignLifecycleLabel(c.lifecycle)}
@@ -64,17 +53,29 @@ function CampaignSlideCard({ c }: { c: BrandMyCampaignItem }) {
             </Badge>
           </div>
         </div>
-        <CardDescription className="mx-auto max-w-md text-pretty text-center text-sm leading-relaxed text-muted-foreground">
+        <CardDescription
+          className={cn(
+            "mx-auto text-pretty text-center text-sm leading-relaxed text-muted-foreground",
+            compact ? "max-w-sm" : "max-w-md",
+          )}
+        >
           {desc}
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-4 border-t border-border/50 bg-muted/25 px-5 py-5 text-sm">
+      <CardContent
+        className={cn(
+          "space-y-4 border-t border-border/50 bg-muted/25 text-sm",
+          compact ? "px-4 py-4" : "px-5 py-5",
+        )}
+      >
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="text-center sm:text-left">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">캠페인 ID</p>
-            <p className="mt-1 break-all font-mono text-xs text-foreground">{c.id}</p>
-          </div>
+          {!compact ? (
+            <div className="text-center sm:text-left">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">캠페인 ID</p>
+              <p className="mt-1 break-all font-mono text-xs text-foreground">{c.id}</p>
+            </div>
+          ) : null}
           <div className="text-center sm:text-left">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">유형</p>
             <p className="mt-1 font-medium text-foreground">{campaignTypeLabel(c.campaignType)}</p>
@@ -115,26 +116,45 @@ function CampaignSlideCard({ c }: { c: BrandMyCampaignItem }) {
       </CardContent>
 
       {payment ? (
-        <CardFooter className="flex flex-wrap justify-center gap-2 border-t bg-muted/35 px-4 py-4">
+        <CardFooter
+          className={cn(
+            "flex flex-wrap justify-center gap-2 border-t bg-muted/35 px-4",
+            compact ? "py-3" : "py-4",
+          )}
+        >
           <Link
             href={`/campaign/setup/complete/${payment.id}`}
             className={cn(buttonVariants({ size: "sm", className: "bg-[#ff2f9b] text-white hover:bg-[#e61c8d]" }))}
           >
             결제·완료 안내
           </Link>
-          <Link href={`/brand/payments/${payment.id}/invoice`} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-            인보이스 화면
+          {compact ? (
+            <Link href="/brand" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+              상세 관리
+            </Link>
+          ) : (
+            <>
+              <Link href={`/brand/payments/${payment.id}/invoice`} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+                인보이스 화면
+              </Link>
+              <a
+                href={`/api/payments/${payment.id}/invoice/download`}
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+              >
+                PDF 다운로드
+              </a>
+            </>
+          )}
+        </CardFooter>
+      ) : compact ? (
+        <CardFooter className="flex flex-wrap justify-center gap-2 border-t bg-muted/35 px-4 py-3">
+          <Link href="/brand" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+            상세 관리
           </Link>
-          <a
-            href={`/api/payments/${payment.id}/invoice/download`}
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-          >
-            PDF 다운로드
-          </a>
         </CardFooter>
       ) : null}
 
-      {c.applications.length > 0 ? (
+      {!compact && c.applications.length > 0 ? (
         <div className="border-t border-border/60 px-4 py-4">
           <details className="group mx-auto max-w-lg">
             <summary className="cursor-pointer list-none text-center text-sm font-medium text-foreground marker:hidden [&::-webkit-details-marker]:hidden">
@@ -183,7 +203,15 @@ function CampaignSlideCard({ c }: { c: BrandMyCampaignItem }) {
   );
 }
 
-export function BrandMyCampaignsCarousel({ campaigns }: { campaigns: BrandMyCampaignItem[] }) {
+export function BrandMyCampaignsCarousel({
+  campaigns,
+  compact = false,
+  className,
+}: {
+  campaigns: BrandMyCampaignItem[];
+  compact?: boolean;
+  className?: string;
+}) {
   const [index, setIndex] = useState(0);
   const n = campaigns.length;
   const canPrev = index > 0;
@@ -215,14 +243,14 @@ export function BrandMyCampaignsCarousel({ campaigns }: { campaigns: BrandMyCamp
 
   if (n === 1) {
     return (
-      <div className="mx-auto flex w-full max-w-4xl justify-center px-1">
-        <CampaignSlideCard c={campaigns[0]} />
+      <div className={cn("mx-auto flex w-full justify-center px-1", compact ? "max-w-md" : "max-w-4xl", className)}>
+        <CampaignSlideCard c={campaigns[0]} compact={compact} />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
+    <div className={cn("mx-auto w-full", compact ? "max-w-lg" : "max-w-4xl", className)}>
       <div className="flex items-center justify-center gap-1 sm:gap-3">
         <Button
           type="button"
@@ -243,7 +271,7 @@ export function BrandMyCampaignsCarousel({ campaigns }: { campaigns: BrandMyCamp
           >
             {campaigns.map((c) => (
               <div key={c.id} className="w-full shrink-0 px-0.5">
-                <CampaignSlideCard c={c} />
+                <CampaignSlideCard c={c} compact={compact} />
               </div>
             ))}
           </div>
@@ -263,7 +291,8 @@ export function BrandMyCampaignsCarousel({ campaigns }: { campaigns: BrandMyCamp
       </div>
 
       <p className="mt-4 text-center text-xs text-muted-foreground">
-        {index + 1} / {n} · 좌우 화살표 키로도 이동할 수 있어요
+        {index + 1} / {n}
+        {compact ? "" : " · 좌우 화살표 키로도 이동할 수 있어요"}
       </p>
     </div>
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { CheckCircle2, Download, ListOrdered } from "lucide-react";
+import { ArrowRight, CheckCircle2, Download, ListOrdered } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getCampaignSubmitInstructions } from "@/lib/campaign-submit-instructions";
@@ -109,11 +109,11 @@ export default async function CampaignSetupCompletePage({ params }: { params: Pr
     value: payment.campaign.description?.trim() || "—",
   });
 
-  const processSteps = [
-    "인보이스 확인 (이 페이지 및 PDF)",
-    "안내 계좌로 무통장 입금",
-    "입금 확인 후 캠페인 진행 시작",
-    "세금계산서 발행 후 카카오톡(또는 이메일)로 송부",
+  const processSteps: { title: string; hint: string }[] = [
+    { title: "인보이스 확인", hint: "이 페이지 및 PDF" },
+    { title: "무통장 입금", hint: "안내 계좌로 송금" },
+    { title: "캠페인 진행", hint: "입금 확인 후 시작" },
+    { title: "세금계산서", hint: "발행 후 카톡·이메일" },
   ];
 
   const vatLine =
@@ -202,18 +202,54 @@ export default async function CampaignSetupCompletePage({ params }: { params: Pr
           <Card className={cn(cardBase)}>
             <CardHeader>
               <CardTitle className="text-lg">2. 결제 프로세스</CardTitle>
-              <CardDescription>아래 순서대로 진행됩니다.</CardDescription>
+              <CardDescription>왼쪽에서 오른쪽으로 진행됩니다.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-0">
-              <ol className="divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-zinc-50/40">
-                {processSteps.map((label, i) => (
-                  <li key={label} className="flex gap-4 px-4 py-3.5 sm:px-5">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/12 text-xs font-bold text-primary">
-                      {i + 1}
-                    </span>
-                    <span className="pt-0.5 text-sm leading-relaxed text-zinc-800">{label}</span>
-                  </li>
-                ))}
+            <CardContent className="px-4 pb-5 pt-0 sm:px-6">
+              <ol className="m-0 list-none p-0">
+                {/* 가로형: lg 이상 — 스텝 + 화살표 */}
+                <li className="hidden lg:block">
+                  <div className="flex items-stretch gap-0">
+                    {processSteps.map((step, i) => (
+                      <div key={step.title} className="flex min-w-0 flex-1 items-stretch">
+                        <div className="flex w-full flex-col rounded-xl border border-zinc-200/90 bg-linear-to-b from-white to-zinc-50/80 px-3 py-4 text-center shadow-sm">
+                          <span className="mx-auto flex size-9 shrink-0 items-center justify-center rounded-full bg-[#ff2f9b] text-xs font-bold text-white shadow-sm">
+                            {i + 1}
+                          </span>
+                          <p className="mt-2.5 text-sm font-semibold leading-snug text-zinc-900">{step.title}</p>
+                          <p className="mt-1 text-xs leading-snug text-zinc-500">{step.hint}</p>
+                        </div>
+                        {i < processSteps.length - 1 ? (
+                          <div
+                            className="flex w-8 shrink-0 items-center justify-center text-zinc-300"
+                            aria-hidden
+                          >
+                            <ArrowRight className="size-5" strokeWidth={2} />
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </li>
+                {/* 태블릿·모바일 — 가로 스크롤로 한 줄 흐름 */}
+                <li className="lg:hidden">
+                  <div className="-mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 pt-0.5 [scrollbar-width:thin] sm:gap-3">
+                    {processSteps.map((step, i) => (
+                      <div key={step.title} className="flex shrink-0 snap-center items-center gap-2 sm:gap-3">
+                        <div className="flex w-[min(42vw,11rem)] flex-col rounded-xl border border-zinc-200/90 bg-linear-to-b from-white to-zinc-50/80 px-3 py-3.5 text-center shadow-sm sm:w-40 sm:py-4">
+                          <span className="mx-auto flex size-8 shrink-0 items-center justify-center rounded-full bg-[#ff2f9b] text-xs font-bold text-white">
+                            {i + 1}
+                          </span>
+                          <p className="mt-2 text-sm font-semibold leading-snug text-zinc-900">{step.title}</p>
+                          <p className="mt-1 text-[11px] leading-snug text-zinc-500 sm:text-xs">{step.hint}</p>
+                        </div>
+                        {i < processSteps.length - 1 ? (
+                          <ArrowRight className="size-4 shrink-0 text-zinc-300 sm:size-5" aria-hidden />
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-1 text-center text-xs text-zinc-500">좌우로 밀어 ①→④ 순서를 확인할 수 있습니다.</p>
+                </li>
               </ol>
             </CardContent>
           </Card>

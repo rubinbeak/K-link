@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarDays, Check, Clock3, Plus, Save, ShieldCheck, Sparkles, Trash2, WandSparkles } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { benefitLabel, BENEFIT_VALUES, platformLabel, PLATFORM_VALUES, regionLabel, REGION_VALUES } from "@/lib/visit-campaign";
 import { useCampaignFormAutosave } from "@/components/campaign/use-campaign-form-autosave";
-import { isFunnelDraftData, type FunnelDraftPayload } from "@/lib/funnel-campaign-finalize";
+import {
+  effectiveFunnelPlaces,
+  isFunnelDraftData,
+  isValidFunnelPlaceRow,
+  type FunnelDraftPayload,
+} from "@/lib/funnel-campaign-finalize";
 import { mergeBrandProfileIntoStep1, type BrandContactStep1 } from "@/lib/brand-profile";
 import { openFinalizePendingTab } from "@/lib/campaign-post-submit";
 
@@ -275,17 +279,11 @@ export function CampaignSetupFunnelForm({
     };
   }, [formData.step3.followerCountOver5k, formData.step3.followerCountUnder5k]);
 
-  const hasInvalidPlace = formData.step2.places.some(
-    (place) =>
-      !place.visitCountry ||
-      !place.address ||
-      !place.eventStartDate ||
-      !place.eventEndDate ||
-      !place.operationStartTime ||
-      !place.operationEndTime ||
-      place.eventEndDate < place.eventStartDate ||
-      place.operationEndTime <= place.operationStartTime,
-  );
+  const cannotProceedFromStep2 = useMemo(() => {
+    const invalidExplicit = formData.step2.places.some((p) => !isValidFunnelPlaceRow(p));
+    const hasVenue = effectiveFunnelPlaces(formData.step2).length > 0;
+    return invalidExplicit || !hasVenue;
+  }, [formData.step2]);
 
   const loadedFromServer = Boolean(initialDraftId && initialDraftData && isFunnelDraftData(initialDraftData));
 
@@ -435,7 +433,7 @@ export function CampaignSetupFunnelForm({
   }, [validPurposeSet, purposeOptions]);
 
   function goNext() {
-    if (step === 2 && hasInvalidPlace) return;
+    if (step === 2 && cannotProceedFromStep2) return;
     setStep((prev) => Math.min(3, prev + 1));
   }
 
@@ -894,7 +892,7 @@ export function CampaignSetupFunnelForm({
                         <div className="space-y-3">
                           {formData.step2.places.length === 0 ? (
                             <p className="rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-500">
-                              필요 시 여러 장소/일정을 추가할 수 있습니다.
+                              위 입력란만 채워도 다음 단계로 진행할 수 있습니다. 여러 장소·일정이 있을 때만 추가하기로 목록에 더 넣어 주세요.
                             </p>
                           ) : null}
 
@@ -1139,7 +1137,7 @@ export function CampaignSetupFunnelForm({
                   ) : null}
                 </div>
 
-                <div className="mt-7 flex flex-wrap justify-center gap-2 border-t border-zinc-200 pt-5">
+                <div className="mt-7 flex flex-wrap justify-center gap-3 border-t border-zinc-200 pt-5">
                   {step > 1 ? (
                     <Button type="button" variant="outline" onClick={goPrev}>
                       이전
@@ -1149,28 +1147,23 @@ export function CampaignSetupFunnelForm({
                     <Button
                       type="button"
                       onClick={goNext}
-                      disabled={step === 2 && hasInvalidPlace}
+                      disabled={step === 2 && cannotProceedFromStep2}
                       className="bg-[#ff2f9b] text-white hover:bg-[#e61c8d]"
                     >
                       다음
                     </Button>
                   ) : null}
                   {step === 3 ? (
-                    <>
-                      <Button
-                        type="button"
-                        size="lg"
-                        disabled={finalizing || savingServer}
-                        onClick={() => void finalizeCampaign()}
-                        className="gap-2 bg-[#ff2f9b] text-white hover:bg-[#e61c8d]"
-                      >
-                        {finalizing ? "제출 중…" : "제출하기"}
-                        <ArrowRight className="size-4" />
-                      </Button>
-                      <Link href="/consulting" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
-                        캠페인 상담받기
-                      </Link>
-                    </>
+                    <Button
+                      type="button"
+                      size="lg"
+                      disabled={finalizing || savingServer}
+                      onClick={() => void finalizeCampaign()}
+                      className="gap-2 bg-[#ff2f9b] text-white hover:bg-[#e61c8d]"
+                    >
+                      {finalizing ? "제출 중…" : "제출하기"}
+                      <ArrowRight className="size-4" />
+                    </Button>
                   ) : null}
                 </div>
               </CardContent>

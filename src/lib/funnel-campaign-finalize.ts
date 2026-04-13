@@ -76,24 +76,47 @@ export function isFunnelDraftData(raw: unknown): raw is FunnelDraftPayload {
   return Boolean(s1 && typeof s1.contactBrandName === "string");
 }
 
+export type FunnelPlaceRow = FunnelDraftPayload["step2"]["places"][number];
+
+/** 방문 1건으로 인정되는지(기본 입력란 또는 추가된 행 공통) */
+export function isValidFunnelPlaceRow(p: FunnelPlaceRow): boolean {
+  return Boolean(
+    p.visitCountry &&
+      p.address &&
+      p.eventStartDate &&
+      p.eventEndDate &&
+      p.operationStartTime &&
+      p.operationEndTime &&
+      p.eventEndDate >= p.eventStartDate &&
+      p.operationEndTime > p.operationStartTime,
+  );
+}
+
+/**
+ * 확정된 `places` + (필드가 모두 채워진) 기본 입력란 `draftPlace`.
+ * 「추가하기」 없이도 draft만으로 1건 방문이 인정됩니다.
+ */
+export function effectiveFunnelPlaces(step2: FunnelDraftPayload["step2"]): FunnelPlaceRow[] {
+  const out: FunnelPlaceRow[] = [...step2.places];
+  const d = step2.draftPlace;
+  if (isValidFunnelPlaceRow(d)) {
+    out.push({ ...d });
+  }
+  return out;
+}
+
 export function validateFunnelDraft(f: FunnelDraftPayload): string | null {
   const { step1, step2, step3 } = f;
   if (!step1.placeType) return "방문 장소 유형을 선택해 주세요.";
   if (step1.placeType === "OTHER" && !step1.placeTypeCustom?.trim()) return "기타 장소 유형을 입력해 주세요.";
   if (!step1.visitPurposes?.length) return "방문/콘텐츠 목적을 1개 이상 선택해 주세요.";
-  if (!step2.places?.length) return "방문 장소·일정을 1곳 이상 추가해 주세요.";
-  for (const p of step2.places) {
-    if (
-      !p.visitCountry ||
-      !p.address ||
-      !p.eventStartDate ||
-      !p.eventEndDate ||
-      !p.operationStartTime ||
-      !p.operationEndTime ||
-      p.eventEndDate < p.eventStartDate ||
-      p.operationEndTime <= p.operationStartTime
-    ) {
-      return "추가된 방문 장소의 일정·시간 정보를 모두 올바르게 입력해 주세요.";
+  const venueRows = effectiveFunnelPlaces(step2);
+  if (!venueRows.length) {
+    return "방문 지역·주소·일정·운영 시간을 모두 입력해 주세요. (여러 장소는 추가하기로 더 넣을 수 있습니다.)";
+  }
+  for (const p of venueRows) {
+    if (!isValidFunnelPlaceRow(p)) {
+      return "방문 장소의 일정·시간 정보를 모두 올바르게 입력해 주세요.";
     }
   }
   if (!step3.targetCountries?.length) return "타겟 국가를 1개 이상 선택해 주세요.";
@@ -157,8 +180,9 @@ export async function finalizeFunnelDraftTransaction(
   if (err) throw new Error(err);
 
   const f = input.funnel;
-  const primary = f.step2.places[0]!;
-  const restPlaces = f.step2.places.slice(1);
+  const venueRows = effectiveFunnelPlaces(f.step2);
+  const primary = venueRows[0]!;
+  const restPlaces = venueRows.slice(1);
   const extraVenue =
     restPlaces.length > 0
       ? `[추가 방문지]\n${restPlaces
